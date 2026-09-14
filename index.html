@@ -9,135 +9,96 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script src="https://js.puter.com/v2/"></script>
 <style>
 *{font-family:'Inter',sans-serif}
 body{background:#08080f;color:#fff;overflow:hidden}
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(800px at 20% 20%,#7c3aed55 0%,transparent 50%),radial-gradient(700px at 80% 80%,#3b82f655 0%,transparent 50%),#08080f;z-index:-1}
-.glass-dark{background:rgba(20,20,35,0.6);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border:1px solid rgba(255,255,255,0.12);box-shadow:inset 0 1px 0 rgba(255,255,255,0.08)}
+.glass-dark{background:rgba(20,20,35,0.6);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border:1px solid rgba(255,255,255,0.12)}
 .glass-input{background:rgba(25,25,40,0.85);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.15);border-radius:32px}
-.sidebar{position:fixed;left:-340px;top:0;bottom:0;width:320px;background:rgba(10,10,18,0.92);backdrop-filter:blur(32px);border-right:1px solid rgba(255,255,255,0.1);z-index:70;padding:0;transition:0.45s cubic-bezier(.32,1.6,.6,1);display:flex;flex-direction:column}
+.sidebar{position:fixed;left:-340px;top:0;bottom:0;width:320px;background:rgba(10,10,18,0.92);backdrop-filter:blur(32px);border-right:1px solid rgba(255,255,255,0.1);z-index:70;transition:0.45s cubic-bezier(.32,1.6,.6,1);display:flex;flex-direction:column}
 .sidebar.open{left:0}
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(12px);z-index:60;display:none}
 .overlay.active{display:block}
-.bubble{max-width:85%;padding:14px 18px;border-radius:20px;font-size:14.5px;line-height:1.6;margin-bottom:14px;word-wrap:break-word}
+.bubble{max-width:85%;padding:14px 18px;border-radius:20px;font-size:14.5px;line-height:1.6;margin-bottom:14px;word-wrap:break-word;animation:pop 0.3s ease}
+@keyframes pop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .user{margin-left:auto;background:linear-gradient(135deg,#8b5cf6,#6366f1);color:#fff;border-radius:20px 20px 4px 20px}
 .ai{margin-right:auto;background:rgba(25,25,40,0.7);border:1px solid rgba(255,255,255,0.1);color:#e5e5e5;border-radius:20px 20px 20px 4px}
-.logo-glow{box-shadow:0 0 40px rgba(139,92,246,0.6)}
+.file-chip{display:inline-flex;align-items:center;gap:8px;background:rgba(139,92,246,0.2);border:1px solid rgba(139,92,246,0.3);padding:6px 12px;border-radius:20px;font-size:12px;margin:4px}
+.login-bg{position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-card{width:100%;max-width:380px;background:rgba(20,20,35,0.85);backdrop-filter:blur(30px);border:1px solid rgba(255,255,255,0.15);border-radius:28px;padding:28px;box-shadow:0 20px 80px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.1)}
 </style>
 </head>
 <body class="h-screen flex flex-col">
 
-<div class="overlay" id="overlay"></div>
+<div id="loginModal" class="login-bg">
+<div class="login-card">
+<div class="text-center mb-6"><div class="w-14 h-14 mx-auto rounded-2xl flex items-center justify-center text-2xl mb-3" style="background:linear-gradient(135deg,#8b5cf6,#6366f1)">◈</div><h2 class="text-[22px] font-black">Welcome back</h2><p class="text-zinc-400 text-[13px] mt-1">Sign in to continue to SnapAI</p></div>
+<input id="email" type="email" placeholder="you@gmail.com" class="w-full glass-dark rounded-xl px-4 py-3 text-[14px] outline-none mb-3">
+<input id="pass" type="password" placeholder="Password" class="w-full glass-dark rounded-xl px-4 py-3 text-[14px] outline-none mb-4">
+<button onclick="doLogin()" class="w-full py-3 rounded-xl font-bold text-white mb-3" style="background:linear-gradient(135deg,#8b5cf6,#6366f1)">Sign in / Sign up</button>
+<div class="flex items-center gap-3 my-4"><div class="flex-1 h-[1px] bg-white/10"></div><p class="text-[11px] text-zinc-500">OR</p><div class="flex-1 h-[1px] bg-white/10"></div></div>
+<button onclick="doLogin()" class="w-full glass-dark rounded-xl py-3 text-[13px] font-bold flex items-center justify-center gap-2"><img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" class="w-5 h-5"> Continue with Google</button>
+<button onclick="doLogin()" class="w-full glass-dark rounded-xl py-3 text-[13px] font-bold mt-2 flex items-center justify-center gap-2"><i class="fa-brands fa-apple text-[16px]"></i> Continue with Apple</button>
+<p class="text-[10px] text-zinc-500 text-center mt-5">By continuing, you agree to SnapAI Terms</p>
+</div>
+</div>
 
-<!-- SIDEBAR - Account Top, History Middle, Profile Bottom -->
+<div class="overlay" id="overlay"></div>
 <div class="sidebar" id="sidebar">
 <div class="p-5 border-b border-white/10">
-<div class="flex items-center justify-between">
-<div class="flex items-center gap-3">
-<div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center font-black">V</div>
-<div><p class="font-bold text-[14px]">Void Rage YT</p><p class="text-[11px] text-zinc-400">voidrageyt@gmail.com</p></div>
+<div class="flex items-center justify-between"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center font-black" id="avatarLetter">V</div><div><p class="font-bold text-[14px]" id="userName">Void Rage YT</p><p class="text-[11px] text-zinc-400" id="userEmail">owner</p></div></div><button id="closeBtn" class="w-8 h-8 glass-dark rounded-full"><i class="fa-solid fa-xmark text-xs"></i></button></div>
+<button onclick="newChat()" class="w-full mt-4 py-3 rounded-xl font-bold text-sm text-white" style="background:linear-gradient(135deg,#8b5cf6,#6366f1)">+ New Chat</button>
 </div>
-<button id="closeBtn" class="w-8 h-8 glass-dark rounded-full"><i class="fa-solid fa-xmark text-xs"></i></button>
-</div>
-<button onclick="newChat()" class="w-full mt-4 py-3 rounded-xl font-bold text-sm text-white" style="background:linear-gradient(135deg,#8b5cf6,#6366f1)"><i class="fa-solid fa-plus mr-2"></i> New Chat</button>
+<div class="flex-1 overflow-hidden flex flex-col"><p class="px-5 pt-4 text-[11px] tracking-widest text-zinc-500 uppercase font-bold">History</p><div id="historyList" class="flex-1 overflow-y-auto px-3 py-3 space-y-2"></div></div>
+<div class="p-4 border-t border-white/10"><div class="flex items-center gap-3 glass-dark p-3 rounded-xl"><img src="https://i.pravatar.cc/100?img=12" class="w-9 h-9 rounded-full"><div class="flex-1"><p class="text-[13px] font-bold" id="bottomName">User</p><p class="text-[11px] text-zinc-400">Free Plan</p></div><button onclick="if(confirm('Delete all?')){localStorage.removeItem('h');loadH()}" class="w-8 h-8 bg-white/10 rounded-full"><i class="fa-solid fa-trash text-[11px]"></i></button></div><button onclick="logout()" class="w-full mt-3 py-2 rounded-xl bg-white/5 text-[12px]">Logout</button></div>
 </div>
 
-<div class="flex-1 overflow-hidden flex flex-col">
-<p class="px-5 pt-4 text-[11px] tracking-widest text-zinc-500 uppercase font-bold">History</p>
-<div id="historyList" class="flex-1 overflow-y-auto px-3 py-3 space-y-2"></div>
-</div>
-
-<div class="p-4 border-t border-white/10">
-<div class="flex items-center gap-3 glass-dark p-3 rounded-xl">
-<img src="https://i.pravatar.cc/100?img=12" class="w-9 h-9 rounded-full">
-<div class="flex-1"><p class="text-[13px] font-bold">Delhi User</p><p class="text-[11px] text-zinc-400">Free Plan • Vision Pro</p></div>
-<button onclick="if(confirm('Delete all history?')){localStorage.removeItem('h');loadH()}" class="w-8 h-8 bg-white/10 rounded-full"><i class="fa-solid fa-trash text-[11px]"></i></button>
-</div>
-</div>
-</div>
-
-<!-- HEADER -->
-<div class="flex justify-between items-center p-4">
-<button id="menuBtn" class="w-11 h-11 glass-dark rounded-full flex items-center justify-center"><i class="fa-solid fa-bars-staggered"></i></button>
-<div class="flex items-center gap-2 font-black text-[18px]"><div class="w-8 h-8 rounded-xl flex items-center justify-center logo-glow" style="background:linear-gradient(135deg,#8b5cf6,#6366f1)">◈</div> SnapAI</div>
-<div class="w-11 h-11"></div>
-</div>
-
-<!-- CHAT - Only Welcome to SnapAI first -->
-<div id="chatBox" class="flex-1 overflow-y-auto px-4">
-<div id="inner" class="max-w-[700px] mx-auto w-full h-full flex flex-col">
-<div id="welcome" class="flex-1 flex flex-col items-center justify-center text-center pb-20">
-<div class="w-[90px] h-[90px] rounded-[24px] flex items-center justify-center text-[40px] mb-6 logo-glow glass-dark" style="background:linear-gradient(135deg,#8b5cf6,#6366f1)">◈</div>
-<h1 class="text-[38px] font-black leading-[1.05]">Welcome to<br><span style="background:linear-gradient(135deg,#a78bfa,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent">SnapAI</span></h1>
-<p class="text-zinc-400 mt-3 text-[14px]">Your intelligent assistant • Ready to help<br>with anything you imagine.</p>
-</div>
-</div>
-</div>
-
-<!-- BOTTOM BAR - Plus Left, Ask anything, Voice, Send -->
-<div class="p-3 pb-[max(12px,env(safe-area-inset-bottom))]">
-<div class="max-w-[720px] mx-auto">
-<div class="glass-input flex items-center gap-1.5 p-1.5">
-<button id="plusBtn" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 hover:bg-white/20 transition"><i class="fa-solid fa-plus text-[13px]"></i></button>
-<input type="file" id="fileIn" hidden accept="image/*,.pdf,.txt,.doc,.docx">
-<textarea id="input" rows="1" placeholder="Ask anything..." class="flex-1 bg-transparent outline-none resize-none py-3 px-2 text-[15px] placeholder:text-zinc-500 max-h-[120px]"></textarea>
-<button id="micBtn" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 hover:bg-white/20 transition">🎤</button>
-<button id="sendBtn" class="w-10 h-10 rounded-full flex items-center justify-center font-black flex-shrink-0 text-white shadow-lg" style="background:linear-gradient(135deg,#8b5cf6,#6366f1)">↑</button>
-</div>
-<p class="text-[10px] text-zinc-500 text-center mt-2.5">SnapAI can do anything • Debate, Image, Maths, Code • Owner: Void Rage YT</p>
-</div>
-</div>
+<div class="flex justify-between items-center p-4"><button id="menuBtn" class="w-11 h-11 glass-dark rounded-full flex items-center justify-center"><i class="fa-solid fa-bars-staggered"></i></button><div class="flex items-center gap-2 font-black text-[18px]"><div class="w-8 h-8 rounded-xl flex items-center justify-center" style="background:linear-gradient(135deg,#8b5cf6,#6366f1)">◈</div> SnapAI</div><div class="w-11 h-11"></div></div>
+<div id="chatBox" class="flex-1 overflow-y-auto px-4"><div id="inner" class="max-w-[700px] mx-auto w-full h-full flex flex-col"><div id="welcome" class="flex-1 flex flex-col items-center justify-center text-center pb-20"><div class="w-[90px] h-[90px] rounded-[24px] flex items-center justify-center text-[40px] mb-6 glass-dark" style="background:linear-gradient(135deg,#8b5cf6,#6366f1)">◈</div><h1 class="text-[38px] font-black leading-[1.05]">Welcome to<br><span style="background:linear-gradient(135deg,#a78bfa,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent">SnapAI</span></h1><p class="text-zinc-400 mt-3 text-[14px]">Your best friend • Ready for anything</p></div></div></div>
+<div class="p-3 pb-[max(12px,env(safe-area-inset-bottom))]"><div class="max-w-[720px] mx-auto"><div id="fileChips" class="flex flex-wrap mb-2"></div><div class="glass-input flex items-center gap-1.5 p-1.5"><button id="plusBtn" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center"><i class="fa-solid fa-plus text-[13px]"></i></button><input type="file" id="fileIn" hidden accept="image/*,.pdf,.txt,.doc,.docx,video/*" multiple><textarea id="input" rows="1" placeholder="Ask anything..." class="flex-1 bg-transparent outline-none resize-none py-3 px-2 text-[15px] placeholder:text-zinc-500"></textarea><button id="micBtn" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">🎤</button><button id="sendBtn" class="w-10 h-10 rounded-full flex items-center justify-center font-black text-white" style="background:linear-gradient(135deg,#8b5cf6,#6366f1)">↑</button></div><p class="text-[10px] text-zinc-500 text-center mt-2.5">SnapAI • Owner: Void Rage YT • Unlimited</p></div></div>
 
 <script>
-const $ = id => document.getElementById(id);
+const $=id=>document.getElementById(id);
 const sidebar=$('sidebar'),overlay=$('overlay'),chatBox=$('chatBox'),inner=$('inner'),input=$('input');
+let attachedFiles=[];
+function checkLogin(){let u=localStorage.getItem('snap_user');if(!u){$('loginModal').style.display='flex'}else{$('loginModal').style.display='none';let d=JSON.parse(u);$('userName').innerText=d.name;$('userEmail').innerText=d.email;$('bottomName').innerText=d.name;$('avatarLetter').innerText=d.name[0].toUpperCase();}}
+function doLogin(){let e=$('email').value.trim()||'user@gmail.com';if(!e.includes('@')){alert('Sahi email daal bhai');return}let name=e.split('@')[0];localStorage.setItem('snap_user',JSON.stringify({email:e,name:name}));checkLogin();}
+function logout(){localStorage.removeItem('snap_user');location.reload()}
+checkLogin();
 $('menuBtn').onclick=()=>{sidebar.classList.add('open');overlay.classList.add('active');loadH()}
-$('closeBtn').onclick=closeM; overlay.onclick=closeM;
-function closeM(){sidebar.classList.remove('open');overlay.classList.remove('active')}
-function newChat(){inner.innerHTML=`<div id="welcome" class="flex-1 flex flex-col items-center justify-center text-center pb-20"><div class="w-[90px] h-[90px] rounded-[24px] flex items-center justify-center text-[40px] mb-6 logo-glow glass-dark" style="background:linear-gradient(135deg,#8b5cf6,#6366f1)">◈</div><h1 class="text-[38px] font-black leading-[1.05]">Welcome to<br><span style="background:linear-gradient(135deg,#a78bfa,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent">SnapAI</span></h1><p class="text-zinc-400 mt-3 text-[14px]">Your intelligent assistant • Ready to help<br>with anything you imagine.</p></div>`;closeM()}
-function saveH(q){let h=JSON.parse(localStorage.getItem('h')||'[]');h.unshift({q,time:new Date().toLocaleTimeString()});localStorage.setItem('h',JSON.stringify(h.slice(0,30)))}
-function loadH(){let h=JSON.parse(localStorage.getItem('h')||'[]');$('historyList').innerHTML=h.length?h.map((x,i)=>`<div class="group glass-dark p-3 rounded-xl flex justify-between items-center cursor-pointer hover:bg-white/10"><span class="truncate text-[13px] flex-1 hist" data-q="${x.q.replace(/"/g,'&quot;')}">${x.q}</span><button onclick="delH(${i});event.stopPropagation()" class="opacity-0 group-hover:opacity-100 w-6 h-6 bg-white/10 rounded-full ml-2"><i class="fa-solid fa-xmark text-[10px]"></i></button></div>`).join(''):'<p class="text-xs text-zinc-500 px-2">No history yet</p>';document.querySelectorAll('.hist').forEach(e=>e.onclick=()=>{input.value=e.dataset.q;closeM();send()})}
-function delH(i){let h=JSON.parse(localStorage.getItem('h')||'[]');h.splice(i,1);localStorage.setItem('h',JSON.stringify(h));loadH()}
+$('closeBtn').onclick=()=>{sidebar.classList.remove('open');overlay.classList.remove('active')}; overlay.onclick=()=>{sidebar.classList.remove('open');overlay.classList.remove('active')}
+function newChat(){inner.innerHTML=`<div id="welcome" class="flex-1 flex flex-col items-center justify-center text-center pb-20"><div class="w-[90px] h-[90px] rounded-[24px] flex items-center justify-center text-[40px] mb-6 glass-dark" style="background:linear-gradient(135deg,#8b5cf6,#6366f1)">◈</div><h1 class="text-[38px] font-black leading-[1.05]">Welcome to<br><span style="background:linear-gradient(135deg,#a78bfa,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent">SnapAI</span></h1><p class="text-zinc-400 mt-3 text-[14px]">Your best friend • Ready for anything</p></div>`;sidebar.classList.remove('open');overlay.classList.remove('active')}
+function saveH(q){let h=JSON.parse(localStorage.getItem('h')||'[]');h.unshift({q});localStorage.setItem('h',JSON.stringify(h.slice(0,30)))}
+function loadH(){let h=JSON.parse(localStorage.getItem('h')||'[]');$('historyList').innerHTML=h.length?h.map((x,i)=>`<div class="glass-dark p-3 rounded-xl flex justify-between items-center"><span class="truncate text-[13px] flex-1 hist" data-q="${x.q.replace(/"/g,'&quot;')}">${x.q}</span><button onclick="let h=JSON.parse(localStorage.getItem('h')||'[]');h.splice(${i},1);localStorage.setItem('h',JSON.stringify(h));loadH()" class="w-6 h-6 bg-white/10 rounded-full ml-2"><i class="fa-solid fa-xmark text-[10px]"></i></button></div>`).join(''):'<p class="text-xs text-zinc-500 px-2">No history</p>';document.querySelectorAll('.hist').forEach(e=>e.onclick=()=>{input.value=e.dataset.q;sidebar.classList.remove('open');overlay.classList.remove('active');send()})}
 $('plusBtn').onclick=()=>$('fileIn').click();
-$('fileIn').onchange=e=>{if(e.target.files[0]){input.value=`Is file ke baare me batao: ${e.target.files[0].name} - `;input.focus()}}
-$('micBtn').onclick=()=>{
- let R=new(window.SpeechRecognition||window.webkitSpeechRecognition)();R.lang='hi-IN';R.start();$('micBtn').innerText='🔴';
- R.onresult=ev=>{input.value=ev.results[0][0].transcript;$('micBtn').innerText='🎤';autoGrow()};
- R.onend=()=>$('micBtn').innerText='🎤';
-}
-function autoGrow(){input.style.height='auto';input.style.height=input.scrollHeight+'px'}
-input.addEventListener('input',autoGrow);
-
+$('fileIn').onchange=e=>{for(let f of e.target.files)attachedFiles.push(f);$('fileChips').innerHTML=attachedFiles.map((f,i)=>`<div class="file-chip">${f.name.slice(0,18)} <i onclick="attachedFiles.splice(${i},1);this.parentElement.remove()" class="fa-solid fa-xmark cursor-pointer"></i></div>`).join('')}
+$('micBtn').onclick=()=>{let R=new(window.SpeechRecognition||window.webkitSpeechRecognition)();R.lang='hi-IN';R.start();$('micBtn').innerText='🔴';R.onresult=ev=>{input.value=ev.results[0][0].transcript;$('micBtn').innerText='🎤'};R.onend=()=>$('micBtn').innerText='🎤'}
 async function send(){
- let txt=input.value.trim(); if(!txt) return;
- let w=$('welcome'); if(w) w.remove();
- let u=document.createElement('div');u.className='bubble user';u.innerText=txt;inner.appendChild(u);
- input.value='';input.style.height='auto';saveH(txt);chatBox.scrollTop=chatBox.scrollHeight;
+ let txt=input.value.trim(); if(!txt &&!attachedFiles.length) return;
+ if($('welcome'))$('welcome').remove();
+ let u=document.createElement('div');u.className='bubble user';u.innerHTML=(attachedFiles.length?`📎 ${attachedFiles.map(f=>f.name).join(', ')}<br>`:'')+txt;inner.appendChild(u);
+ input.value='';saveH(txt);let fileSave=[...attachedFiles];attachedFiles=[];$('fileChips').innerHTML='';chatBox.scrollTop=99999;
  let low=txt.toLowerCase();
- if(low.includes('owner')||low.includes('malik')||low.includes('kisne banaya')||low.includes('who made')||low.includes('creator')||low.includes('who is your owner')){
-  let a=document.createElement('div');a.className='bubble ai';a.innerHTML='<b>My owner is Void Rage YT 🔥</b><br>He created SnapAI - Vision Pro Dark Edition. He is my developer.';inner.appendChild(a);chatBox.scrollTop=99999;return;
- }
- let a=document.createElement('div');a.className='bubble ai';a.innerHTML='✨ <i>SnapAI soch raha hai...</i>';inner.appendChild(a);chatBox.scrollTop=chatBox.scrollHeight;
- let isImg=/photo|image|pic|banao|generate|draw|poster|logo|img|picture|imag[e]/i.test(txt);
+ if(low.includes('owner')||low.includes('malik')||low.includes('kisne banaya')||low.includes('who made')||low.includes('who is your owner')){let a=document.createElement('div');a.className='bubble ai';a.innerHTML='<b>My owner is Void Rage YT 🔥</b><br>Usne hi mujhe banaya hai.';inner.appendChild(a);return;}
+ let a=document.createElement('div');a.className='bubble ai';a.innerHTML='✨ Soch raha hu...';inner.appendChild(a);chatBox.scrollTop=99999;
+ let isImg=/photo|image|pic|banao|generate|draw|poster|logo|picture/i.test(txt);
  if(isImg){
-  let p=`https://image.pollinations.ai/prompt/${encodeURIComponent(txt+', ultra detailed, 4k, vision pro glass')}`+`?seed=${Math.floor(Math.random()*99999)}&width=1024&height=1024&nologo=true`;
-  a.innerHTML=`<b>${txt}</b><br><br><img src="${p}" class="rounded-xl w-full" onload="renderMath();chatBox.scrollTop=99999"><br><div class="flex gap-2 mt-3"><a href="${p}" target="_blank" class="bg-white text-black px-4 py-1.5 rounded-full text-xs font-bold">⬇️ Download</a><button onclick="navigator.clipboard.writeText('${p}')" class="bg-white/10 px-4 py-1.5 rounded-full text-xs">Copy Link</button></div>`;
- } else {
+  let imgUrl=`https://image.pollinations.ai/prompt/${encodeURIComponent(txt)}?seed=${Math.floor(Math.random()*99999)}&width=1024&height=1024&nologo=true`;
+  a.innerHTML=`<b>${txt}</b><br><br><img src="${imgUrl}" class="rounded-xl w-full"><br><div class="flex gap-2 mt-3"><button onclick="downloadImg('${imgUrl}')" class="bg-white text-black px-4 py-1.5 rounded-full text-xs font-bold">⬇️ Download</button></div>`;
+ }else{
   try{
-   let sys=`You are SnapAI by Void Rage YT. You can do EVERYTHING like Google + ChatGPT. Write debate, essay, code, maths step-by-step with LaTeX $$formula$$. If time asked, IST: ${new Date().toLocaleString('en-IN',{timeZone:'Asia/Kolkata'})}. Answer in same language as user. If maths, explain step-by-step clearly. Q: `;
-   let r=await fetch(`https://text.pollinations.ai/${encodeURIComponent(sys+txt)}`);let t=await r.text();
-   a.innerText=t; setTimeout(renderMath,100);
-  }catch(e){a.innerText='Network error, fir se try kar bhai.';}
+   let prompt=`You are SnapAI, created by Void Rage YT. You are user's best friend - talk friendly, casual, in Hinglish if user uses Hindi, otherwise English. Like a real friend, not robotic. You MUST answer EVERY question - no refusal. Maths, science, coding, debate, essay, love advice, homework, current affairs, anything. If maths, use LaTeX $$ $$ and step by step. If user says Hi/Hello, reply like: "Heyy! 😎 kya haal hai? bata kya karwana hai?" - very friendly. Always helpful. Never say you cannot answer. Q: ${txt}`;
+   let res=await puter.ai.chat(prompt,{model:"claude-3-5-sonnet"});
+   if(typeof res==='object'&&res.message)res=res.message;
+   a.innerText=res.toString();
+   setTimeout(()=>{if(window.renderMathInElement)renderMathInElement(inner,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})},100);
+  }catch(e){a.innerText=`Yaar thoda network slow tha, par sun - tune pucha "${txt}" na, iska jawab mai pakka dunga. Ek baar fir se send kar de, abhi turant bata deta hu! 😅`;}
  }
  chatBox.scrollTop=99999;
 }
-function renderMath(){
- if(window.renderMathInElement){
-  renderMathInElement(inner,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}]});
- }
-}
-$('sendBtn').onclick=send;
-input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send()}});
+async function downloadImg(url){try{let r=await fetch(url);let b=await r.blob();let a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`snapai_${Date.now()}.jpg`;a.click();}catch{window.open(url,'_blank')}}
+$('sendBtn').onclick=send; input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send()}});
 </script>
 </body>
 </html>
