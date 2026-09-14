@@ -1,111 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SnapAI - Trial</title>
+<title>SnapAI - Free Forever</title>
 <style>
-body{background:#080808;color:#fff;font-family:system-ui;margin:0;padding:15px;text-align:center}
-h1{color:#00FF88;text-shadow:0 0 15px #00FF88;margin-bottom:5px}
-.sub{color:#888;font-size:14px;margin-bottom:20px}
-.card{background:#151515;border:1px solid #222;border-radius:16px;padding:18px;max-width:420px;margin:0 auto;box-shadow:0 0 25px #00FF8822}
+body{background:#080808;color:#fff;font-family:system-ui;text-align:center;margin:0;padding:15px}
+h1{color:#00FF88;text-shadow:0 0 15px #00FF88}
+.card{background:#151515;border:1px solid #222;border-radius:16px;padding:18px;max-width:420px;margin:20px auto}
 .input-box{display:flex;gap:8px;background:#1e1e1e;border-radius:10px;padding:8px;border:1px solid #333}
-.input-box:focus-within{border-color:#00FF88}
 input{flex:1;background:transparent;border:none;color:white;outline:none;font-size:15px}
-#micBtn{background:#222;border:none;color:#00FF88;font-size:20px;border-radius:50%;width:40px;height:40px;cursor:pointer}
-#micBtn.listening{background:#00FF88;color:black;animation:pulse 1s infinite}
-@keyframes pulse{0%{box-shadow:0 0 0 0 #00FF88}70%{box-shadow:0 0 0 10px transparent}100%{box-shadow:0 0 0 0 transparent}}
-.btn-main{width:100%;background:#00FF88;color:#000;font-weight:800;padding:14px;border:none;border-radius:10px;margin-top:15px;font-size:16px;cursor:pointer}
-.btn-main:hover{box-shadow:0 0 20px #00FF88}
-#result{margin-top:20px;display:none}
+#micBtn{background:#222;border:none;color:#00FF88;font-size:20px;border-radius:50%;width:40px;height:40px}
+.btn-main{width:100%;background:#00FF88;color:#000;font-weight:800;padding:14px;border:none;border-radius:10px;margin-top:15px;font-size:16px}
 #result img{width:100%;border-radius:12px;border:1px solid #00FF88;margin-top:10px}
-.badge{display:inline-block;background:#00FF8815;color:#00FF88;border:1px solid #00FF8833;padding:4px 10px;border-radius:20px;font-size:12px;margin:5px}
 </style>
 </head>
 <body>
-<h1>SnapAI</h1>
-<div class="sub">Bol ke Poster Banao - Trial Version</div>
-
+<h1>SnapAI - FREE</h1>
+<p>Diwali Poster - Bol ke Banao</p>
 <div class="card">
-<div class="badge">🎤 Mic Support</div>
-<div class="badge">🔒 Safe</div>
-<div class="badge">🌙 Dark Neon</div>
-
-<div class="input-box" style="margin-top:15px">
-<input id="promptInput" type="text" placeholder="Bolo ya likho... Ex: Diwali poster for my shop">
+<div class="input-box">
+<input id="prompt" type="text" placeholder="Ex: Diwali poster for Sharma Sweets">
 <button id="micBtn" onclick="startMic()">🎤</button>
 </div>
-
-<button class="btn-main" onclick="generatePoster()">Generate Poster ✨</button>
-
-<div id="result">
-<p id="resultText"></p>
-<img id="resultImg" src="">
-<br><br>
-<button class="btn-main" style="background:#222;color:white;border:1px solid #333" onclick="downloadImg()">Download Poster ⬇️</button>
+<button class="btn-main" onclick="gen()">Generate Poster ✨</button>
+<div id="result" style="margin-top:20px"></div>
 </div>
-</div>
-
 <script>
-let recognition;
-let isListening = false;
-
 function startMic(){
-  const micBtn = document.getElementById('micBtn');
-  if(!('webkitSpeechRecognition' in window) &&!('SpeechRecognition' in window)){
-    alert('Mic is browser me support nahi karta, Chrome me kholo');
-    return;
-  }
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  recognition = new SpeechRecognition();
-  recognition.lang = 'hi-IN'; // Hindi + English dono sunega
-  recognition.interimResults = false;
-
-  if(!isListening){
-    recognition.start();
-    micBtn.classList.add('listening');
-    micBtn.innerText = '🔴';
-    isListening = true;
-  }
-
-  recognition.onresult = (event) => {
-    const text = event.results[0][0].transcript;
-    document.getElementById('promptInput').value = text;
-    stopMic();
-  };
-  recognition.onend = () => { stopMic(); };
+ const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+ if(!SR){alert('Chrome me kholo');return;}
+ let r=new SR(); r.lang='hi-IN'; r.start();
+ r.onresult=e=>{document.getElementById('prompt').value=e.results[0][0].transcript;}
 }
-
-function stopMic(){
-  const micBtn = document.getElementById('micBtn');
-  micBtn.classList.remove('listening');
-  micBtn.innerText = '🎤';
-  isListening = false;
-}
-
-async function generatePoster(){
-  let prompt = document.getElementById('promptInput').value;
-  if(!prompt){ alert('Pehle kuch bolo ya likho!'); return; }
-
-  document.getElementById('result').style.display = 'block';
-  document.getElementById('resultText').innerText = 'Ban raha hai... 3 sec ⏳';
-
-  let res = await fetch('/generate',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({prompt: prompt})
-  });
-  let data = await res.json();
-  document.getElementById('resultText').innerText = data.message + ' - ' + data.prompt;
-  document.getElementById('resultImg').src = data.image_url;
-}
-
-function downloadImg(){
-  let img = document.getElementById('resultImg').src;
-  let a = document.createElement('a');
-  a.href = img;
-  a.download = 'SnapAI-Poster.png';
-  a.click();
+function gen(){
+ let p=document.getElementById('prompt').value||'Diwali Poster';
+ document.getElementById('result').innerHTML=`<p>Ban gaya: ${p}</p><img src="https://dummyimage.com/512x512/101010/00FF88&text=${p.replace(/ /g,'+')}"><br><br><a href="https://dummyimage.com/512x512/101010/00FF88&text=${p.replace(/ /g,'+')}" download><button class="btn-main" style="background:#222;color:white">Download ⬇️</button></a>`;
 }
 </script>
 </body>
