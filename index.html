@@ -1,141 +1,143 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SnapAI • Glass Prism</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SnapAI • Vision Pro</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 <style>
 *{font-family:'Inter',sans-serif}
-body{background:#f8f7ff;overflow:hidden}
-.glass{background:rgba(255,255,255,0.85);backdrop-filter:blur(22px);border:1px solid rgba(0,0,0,0.06)}
-.sidebar{position:fixed;left:-310px;top:0;bottom:0;width:300px;background:rgba(255,255,255,0.92);backdrop-filter:blur(30px);border-right:1px solid rgba(0,0,0,0.08);z-index:60;padding:20px;transition:0.4s cubic-bezier(.34,1.56,.64,1);display:flex;flex-direction:column}
-.sidebar.open{left:0;box-shadow:0 0 80px rgba(0,0,0,0.15)}
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.25);backdrop-filter:blur(8px);z-index:50;display:none}
+body{background:#08080f;color:#fff;overflow:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(800px at 20% 20%,#7c3aed55 0%,transparent 50%),radial-gradient(700px at 80% 80%,#3b82f655 0%,transparent 50%),#08080f;z-index:-1}
+.glass-dark{background:rgba(20,20,35,0.6);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border:1px solid rgba(255,255,255,0.12);box-shadow:inset 0 1px 0 rgba(255,255,255,0.08)}
+.glass-input{background:rgba(25,25,40,0.85);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.15);border-radius:32px}
+.sidebar{position:fixed;left:-340px;top:0;bottom:0;width:320px;background:rgba(10,10,18,0.92);backdrop-filter:blur(32px);border-right:1px solid rgba(255,255,255,0.1);z-index:70;padding:0;transition:0.45s cubic-bezier(.32,1.6,.6,1);display:flex;flex-direction:column}
+.sidebar.open{left:0}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(12px);z-index:60;display:none}
 .overlay.active{display:block}
-.bubble{max-width:82%;padding:12px 16px;border-radius:18px;font-size:14px;line-height:1.5}
-.user{margin-left:auto;background:#111;color:#fff;border-radius:18px 18px 4px 18px}
-.ai{margin-right:auto;background:#fff;border:1px solid #ececec;box-shadow:0 2px 10px rgba(0,0,0,0.04);border-radius:18px 18px 18px 4px;color:#111}
-.logo-mark{width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg,#8B5CF6,#6366F1);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900}
+.bubble{max-width:85%;padding:14px 18px;border-radius:20px;font-size:14.5px;line-height:1.6;margin-bottom:14px;word-wrap:break-word}
+.user{margin-left:auto;background:linear-gradient(135deg,#8b5cf6,#6366f1);color:#fff;border-radius:20px 20px 4px 20px}
+.ai{margin-right:auto;background:rgba(25,25,40,0.7);border:1px solid rgba(255,255,255,0.1);color:#e5e5e5;border-radius:20px 20px 20px 4px}
+.logo-glow{box-shadow:0 0 40px rgba(139,92,246,0.6)}
 </style>
 </head>
 <body class="h-screen flex flex-col">
 
-<div class="overlay" id="overlay" onclick="closeMenu()"></div>
+<div class="overlay" id="overlay"></div>
 
-<!-- SIDEBAR - Sirf 3 lines pe click karne pe khulega -->
+<!-- SIDEBAR - Account Top, History Middle, Profile Bottom -->
 <div class="sidebar" id="sidebar">
-<div class="flex justify-between items-center mb-6">
-<div class="flex items-center gap-2 font-black text-[18px]"><div class="logo-mark">◈</div> SnapAI</div>
-<button onclick="closeMenu()" class="w-8 h-8 bg-black/5 rounded-full"><i class="fa-solid fa-xmark text-xs"></i></button>
+<div class="p-5 border-b border-white/10">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center font-black">V</div>
+<div><p class="font-bold text-[14px]">Void Rage YT</p><p class="text-[11px] text-zinc-400">voidrageyt@gmail.com</p></div>
 </div>
-<button onclick="newChat()" class="w-full bg-black text-white font-bold py-3 rounded-xl mb-5"><i class="fa-solid fa-plus mr-2"></i> New Chat</button>
-<p class="text-[11px] tracking-widest text-zinc-400 uppercase mb-2 font-bold">History</p>
-<div id="historyList" class="flex-1 overflow-y-auto space-y-2 text-sm"></div>
-<div class="border-t border-black/10 pt-4 mt-3 flex gap-3 items-center">
-<img src="https://i.pravatar.cc/100" class="w-9 h-9 rounded-full"><div><p class="text-sm font-bold">Delhi User</p><p class="text-xs text-zinc-500">Free • Glass Prism</p></div>
+<button id="closeBtn" class="w-8 h-8 glass-dark rounded-full"><i class="fa-solid fa-xmark text-xs"></i></button>
 </div>
-</div>
-
-<!-- HEADER - Bilkul teri photo jaisa -->
-<div class="flex justify-between items-center p-4 bg-white border-b border-black/5">
-<button id="menuBtn" class="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center"><i class="fa-solid fa-bars-staggered"></i></button>
-<div class="flex items-center gap-2 font-black text-[19px] tracking-tight"><div class="logo-mark" style="width:28px;height:28px;border-radius:8px;font-size:14px">◈</div> SnapAI</div>
-<button class="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center"><i class="fa-solid fa-pen"></i></button>
+<button onclick="newChat()" class="w-full mt-4 py-3 rounded-xl font-bold text-sm text-white" style="background:linear-gradient(135deg,#8b5cf6,#6366f1)"><i class="fa-solid fa-plus mr-2"></i> New Chat</button>
 </div>
 
-<div id="chatBox" class="flex-1 overflow-y-auto p-4 bg-[#fcfcff]">
-<div class="max-w-[680px] mx-auto w-full">
-<div class="py-10 text-center">
-<div class="w-12 h-12 mx-auto rounded-2xl flex items-center justify-center text-white text-xl mb-4" style="background:linear-gradient(135deg,#8B5CF6,#6366F1)">◈</div>
-<h1 class="text-[28px] font-black leading-tight">Welcome to<br>SnapAI</h1>
-<p class="text-zinc-500 mt-2 text-[14px]">Your intelligent assistant, ready to help<br>with anything.</p>
-<div class="grid grid-cols-2 gap-3 mt-8 text-left">
-<div onclick="fill('Current time in Delhi?')" class="glass p-4 rounded-2xl cursor-pointer hover:bg-white"><p class="font-semibold text-sm">Current time?</p><p class="text-xs text-zinc-500 mt-1">Live Delhi time</p></div>
-<div onclick="fill('Who is President of India?')" class="glass p-4 rounded-2xl cursor-pointer hover:bg-white"><p class="font-semibold text-sm">President of India?</p><p class="text-xs text-zinc-500 mt-1">100% accurate</p></div>
+<div class="flex-1 overflow-hidden flex flex-col">
+<p class="px-5 pt-4 text-[11px] tracking-widest text-zinc-500 uppercase font-bold">History</p>
+<div id="historyList" class="flex-1 overflow-y-auto px-3 py-3 space-y-2"></div>
 </div>
+
+<div class="p-4 border-t border-white/10">
+<div class="flex items-center gap-3 glass-dark p-3 rounded-xl">
+<img src="https://i.pravatar.cc/100?img=12" class="w-9 h-9 rounded-full">
+<div class="flex-1"><p class="text-[13px] font-bold">Delhi User</p><p class="text-[11px] text-zinc-400">Free Plan • Vision Pro</p></div>
+<button onclick="if(confirm('Delete all history?')){localStorage.removeItem('h');loadH()}" class="w-8 h-8 bg-white/10 rounded-full"><i class="fa-solid fa-trash text-[11px]"></i></button>
 </div>
 </div>
 </div>
 
-<!-- INPUT BAR -->
-<div class="p-3 bg-white border-t border-black/5">
+<!-- HEADER -->
+<div class="flex justify-between items-center p-4">
+<button id="menuBtn" class="w-11 h-11 glass-dark rounded-full flex items-center justify-center"><i class="fa-solid fa-bars-staggered"></i></button>
+<div class="flex items-center gap-2 font-black text-[18px]"><div class="w-8 h-8 rounded-xl flex items-center justify-center logo-glow" style="background:linear-gradient(135deg,#8b5cf6,#6366f1)">◈</div> SnapAI</div>
+<div class="w-11 h-11"></div>
+</div>
+
+<!-- CHAT - Only Welcome to SnapAI first -->
+<div id="chatBox" class="flex-1 overflow-y-auto px-4">
+<div id="inner" class="max-w-[700px] mx-auto w-full h-full flex flex-col">
+<div id="welcome" class="flex-1 flex flex-col items-center justify-center text-center pb-20">
+<div class="w-[90px] h-[90px] rounded-[24px] flex items-center justify-center text-[40px] mb-6 logo-glow glass-dark" style="background:linear-gradient(135deg,#8b5cf6,#6366f1)">◈</div>
+<h1 class="text-[38px] font-black leading-[1.05]">Welcome to<br><span style="background:linear-gradient(135deg,#a78bfa,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent">SnapAI</span></h1>
+<p class="text-zinc-400 mt-3 text-[14px]">Your intelligent assistant • Ready to help<br>with anything you imagine.</p>
+</div>
+</div>
+</div>
+
+<!-- BOTTOM BAR - Plus Left, Ask anything, Voice, Send -->
+<div class="p-3 pb-[max(12px,env(safe-area-inset-bottom))]">
 <div class="max-w-[720px] mx-auto">
-<div class="flex items-end gap-2 bg-[#f2f2f7] border border-black/5 rounded-[28px] p-2">
-<button onclick="document.getElementById('fileIn').click()" class="w-9 h-9 rounded-full bg-white shadow-sm flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-plus text-xs"></i></button>
-<input type="file" id="fileIn" hidden>
-<textarea id="input" rows="1" placeholder="Ask anything..." class="flex-1 bg-transparent outline-none resize-none py-2.5 px-1 text-[15px]"></textarea>
-<button onclick="startMic()" id="micBtn" class="w-9 h-9 rounded-full bg-white shadow-sm flex items-center justify-center flex-shrink-0">🎤</button>
-<button onclick="send()" class="w-9 h-9 rounded-full bg-black text-white flex items-center justify-center font-bold flex-shrink-0">↑</button>
+<div class="glass-input flex items-center gap-1.5 p-1.5">
+<button id="plusBtn" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 hover:bg-white/20 transition"><i class="fa-solid fa-plus text-[13px]"></i></button>
+<input type="file" id="fileIn" hidden accept="image/*,.pdf,.txt,.doc,.docx">
+<textarea id="input" rows="1" placeholder="Ask anything..." class="flex-1 bg-transparent outline-none resize-none py-3 px-2 text-[15px] placeholder:text-zinc-500 max-h-[120px]"></textarea>
+<button id="micBtn" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 hover:bg-white/20 transition">🎤</button>
+<button id="sendBtn" class="w-10 h-10 rounded-full flex items-center justify-center font-black flex-shrink-0 text-white shadow-lg" style="background:linear-gradient(135deg,#8b5cf6,#6366f1)">↑</button>
 </div>
-<p class="text-[10px] text-zinc-400 text-center mt-2">SnapAI can make mistakes. Check important info. • Owner: Void Rage YT</p>
+<p class="text-[10px] text-zinc-500 text-center mt-2.5">SnapAI can do anything • Debate, Image, Maths, Code • Owner: Void Rage YT</p>
 </div>
 </div>
 
 <script>
-const sidebar=document.getElementById('sidebar'), overlay=document.getElementById('overlay'), menuBtn=document.getElementById('menuBtn'), chatBox=document.getElementById('chatBox'), input=document.getElementById('input'), historyList=document.getElementById('historyList');
-
-menuBtn.onclick=()=>{sidebar.classList.add('open');overlay.classList.add('active'); loadHistory();}
-function closeMenu(){sidebar.classList.remove('open');overlay.classList.remove('active');}
-function fill(t){input.value=t; send();}
-
-// HISTORY LOGIC
-function saveHistory(q){
- let h=JSON.parse(localStorage.getItem('snap_history')||'[]');
- h.unshift({q,time:new Date().toLocaleTimeString()});
- localStorage.setItem('snap_history', JSON.stringify(h.slice(0,20)));
+const $ = id => document.getElementById(id);
+const sidebar=$('sidebar'),overlay=$('overlay'),chatBox=$('chatBox'),inner=$('inner'),input=$('input');
+$('menuBtn').onclick=()=>{sidebar.classList.add('open');overlay.classList.add('active');loadH()}
+$('closeBtn').onclick=closeM; overlay.onclick=closeM;
+function closeM(){sidebar.classList.remove('open');overlay.classList.remove('active')}
+function newChat(){inner.innerHTML=`<div id="welcome" class="flex-1 flex flex-col items-center justify-center text-center pb-20"><div class="w-[90px] h-[90px] rounded-[24px] flex items-center justify-center text-[40px] mb-6 logo-glow glass-dark" style="background:linear-gradient(135deg,#8b5cf6,#6366f1)">◈</div><h1 class="text-[38px] font-black leading-[1.05]">Welcome to<br><span style="background:linear-gradient(135deg,#a78bfa,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent">SnapAI</span></h1><p class="text-zinc-400 mt-3 text-[14px]">Your intelligent assistant • Ready to help<br>with anything you imagine.</p></div>`;closeM()}
+function saveH(q){let h=JSON.parse(localStorage.getItem('h')||'[]');h.unshift({q,time:new Date().toLocaleTimeString()});localStorage.setItem('h',JSON.stringify(h.slice(0,30)))}
+function loadH(){let h=JSON.parse(localStorage.getItem('h')||'[]');$('historyList').innerHTML=h.length?h.map((x,i)=>`<div class="group glass-dark p-3 rounded-xl flex justify-between items-center cursor-pointer hover:bg-white/10"><span class="truncate text-[13px] flex-1 hist" data-q="${x.q.replace(/"/g,'&quot;')}">${x.q}</span><button onclick="delH(${i});event.stopPropagation()" class="opacity-0 group-hover:opacity-100 w-6 h-6 bg-white/10 rounded-full ml-2"><i class="fa-solid fa-xmark text-[10px]"></i></button></div>`).join(''):'<p class="text-xs text-zinc-500 px-2">No history yet</p>';document.querySelectorAll('.hist').forEach(e=>e.onclick=()=>{input.value=e.dataset.q;closeM();send()})}
+function delH(i){let h=JSON.parse(localStorage.getItem('h')||'[]');h.splice(i,1);localStorage.setItem('h',JSON.stringify(h));loadH()}
+$('plusBtn').onclick=()=>$('fileIn').click();
+$('fileIn').onchange=e=>{if(e.target.files[0]){input.value=`Is file ke baare me batao: ${e.target.files[0].name} - `;input.focus()}}
+$('micBtn').onclick=()=>{
+ let R=new(window.SpeechRecognition||window.webkitSpeechRecognition)();R.lang='hi-IN';R.start();$('micBtn').innerText='🔴';
+ R.onresult=ev=>{input.value=ev.results[0][0].transcript;$('micBtn').innerText='🎤';autoGrow()};
+ R.onend=()=>$('micBtn').innerText='🎤';
 }
-function loadHistory(){
- let h=JSON.parse(localStorage.getItem('snap_history')||'[]');
- historyList.innerHTML = h.length? h.map((x,i)=>`<div onclick="fill('${x.q.replace(/'/g, "\\'")}')" class="p-2.5 glass rounded-xl cursor-pointer flex justify-between"><span class="truncate">${x.q}</span><span class="text-[10px] text-zinc-400">${x.time}</span></div>`).join('') : '<p class="text-zinc-400 text-xs">No history yet</p>';
-}
-function newChat(){document.querySelector('#chatBox > div').innerHTML=`<div class="py-10 text-center"><div class="w-12 h-12 mx-auto rounded-2xl flex items-center justify-center text-white text-xl mb-4" style="background:linear-gradient(135deg,#8B5CF6,#6366F1)">◈</div><h1 class="text-[28px] font-black leading-tight">Welcome to<br>SnapAI</h1><p class="text-zinc-500 mt-2 text-[14px]">Your intelligent assistant, ready to help<br>with anything.</p><div class="grid grid-cols-2 gap-3 mt-8 text-left"><div onclick="fill('Current time in Delhi?')" class="glass p-4 rounded-2xl cursor-pointer hover:bg-white"><p class="font-semibold text-sm">Current time?</p><p class="text-xs text-zinc-500 mt-1">Live Delhi time</p></div><div onclick="fill('Who is President of India?')" class="glass p-4 rounded-2xl cursor-pointer hover:bg-white"><p class="font-semibold text-sm">President of India?</p><p class="text-xs text-zinc-500 mt-1">100% accurate</p></div></div></div>`; closeMenu();}
-
-// MIC
-function startMic(){
- let r=new (window.SpeechRecognition||window.webkitSpeechRecognition)();
- r.lang='hi-IN'; r.start(); micBtn.innerText='🔴';
- r.onresult=e=>{input.value=e.results[0][0].transcript; micBtn.innerText='🎤';}
- r.onend=()=>micBtn.innerText='🎤';
-}
+function autoGrow(){input.style.height='auto';input.style.height=input.scrollHeight+'px'}
+input.addEventListener('input',autoGrow);
 
 async function send(){
  let txt=input.value.trim(); if(!txt) return;
- if(document.querySelector('#chatBox > div').innerHTML.includes('Welcome to')) document.querySelector('#chatBox > div').innerHTML='';
- let wrap=document.querySelector('#chatBox > div');
- let u=document.createElement('div'); u.className='bubble user mb-3'; u.innerText=txt; wrap.appendChild(u);
- input.value=''; saveHistory(txt);
- chatBox.scrollTop=chatBox.scrollHeight;
-
- // OWNER CHECK
- if(txt.toLowerCase().includes('owner') || txt.toLowerCase().includes('kisne banaya') || txt.toLowerCase().includes('malik') || txt.toLowerCase().includes('who made you') || txt.toLowerCase().includes('your owner')){
-   let a=document.createElement('div'); a.className='bubble ai mb-3'; a.innerHTML='<b>My owner is Void Rage YT 🔥</b><br>He is my creator and developer.';
-   wrap.appendChild(a); return;
+ let w=$('welcome'); if(w) w.remove();
+ let u=document.createElement('div');u.className='bubble user';u.innerText=txt;inner.appendChild(u);
+ input.value='';input.style.height='auto';saveH(txt);chatBox.scrollTop=chatBox.scrollHeight;
+ let low=txt.toLowerCase();
+ if(low.includes('owner')||low.includes('malik')||low.includes('kisne banaya')||low.includes('who made')||low.includes('creator')||low.includes('who is your owner')){
+  let a=document.createElement('div');a.className='bubble ai';a.innerHTML='<b>My owner is Void Rage YT 🔥</b><br>He created SnapAI - Vision Pro Dark Edition. He is my developer.';inner.appendChild(a);chatBox.scrollTop=99999;return;
  }
-
- let a=document.createElement('div'); a.className='bubble ai mb-3'; a.innerHTML='Thinking... ⏳'; wrap.appendChild(a);
- chatBox.scrollTop=chatBox.scrollHeight;
-
- // LOGIC: Image vs Text
- let isImage = /photo|image|pic|banao|generate|draw|poster|logo/i.test(txt);
- if(isImage){
-   let img=`https://image.pollinations.ai/prompt/${encodeURIComponent(txt)}?width=1024&height=1024&seed=${Math.random()}&nologo=true`;
-   a.innerHTML=`<b>${txt}</b><br><br><img src="${img}" class="rounded-xl w-full"><br><a href="${img}" target="_blank" class="inline-block mt-3 bg-black text-white px-4 py-2 rounded-full text-xs font-bold">⬇️ Download HD</a>`;
+ let a=document.createElement('div');a.className='bubble ai';a.innerHTML='✨ <i>SnapAI soch raha hai...</i>';inner.appendChild(a);chatBox.scrollTop=chatBox.scrollHeight;
+ let isImg=/photo|image|pic|banao|generate|draw|poster|logo|img|picture|imag[e]/i.test(txt);
+ if(isImg){
+  let p=`https://image.pollinations.ai/prompt/${encodeURIComponent(txt+', ultra detailed, 4k, vision pro glass')}`+`?seed=${Math.floor(Math.random()*99999)}&width=1024&height=1024&nologo=true`;
+  a.innerHTML=`<b>${txt}</b><br><br><img src="${p}" class="rounded-xl w-full" onload="renderMath();chatBox.scrollTop=99999"><br><div class="flex gap-2 mt-3"><a href="${p}" target="_blank" class="bg-white text-black px-4 py-1.5 rounded-full text-xs font-bold">⬇️ Download</a><button onclick="navigator.clipboard.writeText('${p}')" class="bg-white/10 px-4 py-1.5 rounded-full text-xs">Copy Link</button></div>`;
  } else {
-   // ACCURATE ANSWER LOGIC
-   let lower=txt.toLowerCase();
-   let ans='';
-   if(lower.includes('time')){
-     ans=`<b>Current Time (Delhi, India):</b><br>${new Date().toLocaleString('en-IN',{timeZone:'Asia/Kolkata', weekday:'long', year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit'})} IST`;
-   } else if(lower.includes('president')){
-     ans=`<b>President of India:</b> Droupadi Murmu (as of 2026)<br><b>Prime Minister:</b> Narendra Modi<br><b>Source:</b> Live verified.`;
-   } else {
-     // For ANY other question - use AI text API for accurate answer
-     try{
-       let res=await fetch(`https://text.pollinations.ai/${encodeURIComponent('You are SnapAI, created by Void Rage YT. Answer accurately and in same language as user asked. Question: '+txt)}`);
-       let t=await res.text();
-       ans=t;
-     }catch(e){ ans='I am SnapAI. I can answer anything accurately. Please try again.'; }
-   }
-   a.innerHTML=ans+`<br><br><span class="text-[10px] text-zinc-400">✓ Verified • Accurate • By
+  try{
+   let sys=`You are SnapAI by Void Rage YT. You can do EVERYTHING like Google + ChatGPT. Write debate, essay, code, maths step-by-step with LaTeX $$formula$$. If time asked, IST: ${new Date().toLocaleString('en-IN',{timeZone:'Asia/Kolkata'})}. Answer in same language as user. If maths, explain step-by-step clearly. Q: `;
+   let r=await fetch(`https://text.pollinations.ai/${encodeURIComponent(sys+txt)}`);let t=await r.text();
+   a.innerText=t; setTimeout(renderMath,100);
+  }catch(e){a.innerText='Network error, fir se try kar bhai.';}
+ }
+ chatBox.scrollTop=99999;
+}
+function renderMath(){
+ if(window.renderMathInElement){
+  renderMathInElement(inner,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}]});
+ }
+}
+$('sendBtn').onclick=send;
+input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send()}});
+</script>
+</body>
+</html>
