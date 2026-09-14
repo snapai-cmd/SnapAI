@@ -1,40 +1,94 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SnapAI - Free Forever</title>
+<title>SnapAI</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-body{background:#080808;color:#fff;font-family:system-ui;text-align:center;margin:0;padding:15px}
-h1{color:#00FF88;text-shadow:0 0 15px #00FF88}
-.card{background:#151515;border:1px solid #222;border-radius:16px;padding:18px;max-width:420px;margin:20px auto}
-.input-box{display:flex;gap:8px;background:#1e1e1e;border-radius:10px;padding:8px;border:1px solid #333}
-input{flex:1;background:transparent;border:none;color:white;outline:none;font-size:15px}
-#micBtn{background:#222;border:none;color:#00FF88;font-size:20px;border-radius:50%;width:40px;height:40px}
-.btn-main{width:100%;background:#00FF88;color:#000;font-weight:800;padding:14px;border:none;border-radius:10px;margin-top:15px;font-size:16px}
-#result img{width:100%;border-radius:12px;border:1px solid #00FF88;margin-top:10px}
+*{font-family:'Inter',sans-serif}
+body{background:#0a0a0a;color:#ececec}
+#sidebar{transform:translateX(-100%);transition:0.3s}
+#sidebar.open{transform:translateX(0)}
 </style>
 </head>
-<body>
-<h1>SnapAI - FREE</h1>
-<p>Diwali Poster - Bol ke Banao</p>
-<div class="card">
-<div class="input-box">
-<input id="prompt" type="text" placeholder="Ex: Diwali poster for Sharma Sweets">
-<button id="micBtn" onclick="startMic()">🎤</button>
+<body class="h-screen flex flex-col">
+
+<div class="flex justify-between items-center p-4 bg-[#0a0a0a] border-b border-zinc-800">
+<button onclick="toggleSidebar()" class="text-xl">☰</button>
+<p class="font-bold tracking-wide">SnapAI</p>
+<button onclick="newChat()" class="w-8 h-8 rounded-full border border-zinc-700 flex items-center justify-center">+</button>
 </div>
-<button class="btn-main" onclick="gen()">Generate Poster ✨</button>
-<div id="result" style="margin-top:20px"></div>
+
+<div id="sidebar" class="fixed inset-0 z-50 flex">
+<div class="w-72 bg-[#111] p-4 flex flex-col">
+<div class="flex justify-between items-center mb-6"><h2 class="font-bold">Chats</h2><button onclick="toggleSidebar()">✕</button></div>
+<button onclick="newChat()" class="w-full bg-white text-black font-bold py-3 rounded-full mb-4">+ New Chat</button>
+<div id="historyList" class="flex-1 overflow-y-auto space-y-2 text-sm text-zinc-400">Koi history nahi</div>
 </div>
+<div class="flex-1 bg-black/60" onclick="toggleSidebar()"></div>
+</div>
+
+<div id="chatContainer" class="flex-1 overflow-y-auto p-4 flex flex-col items-center justify-center">
+<h1 class="text-2xl font-bold">Kya banana hai?</h1>
+<p class="text-zinc-500 text-sm mt-2 text-center max-w-[280px]">Jo chahe likho - "ek cute cat ki photo", "mere shop ka logo", "ek ladki ki painting" - AI wahi banayega.</p>
+</div>
+
+<div class="p-3 bg-[#0a0a0a] border-t border-zinc-800">
+<div id="previewArea" class="hidden mb-2"></div>
+<div class="flex items-end gap-2 bg-[#1e1e1e] rounded-[28px] p-2 border border-zinc-700">
+<button onclick="document.getElementById('fileInput').click()" class="w-9 h-9 rounded-full bg-zinc-800 flex items-center justify-center flex-shrink-0">+</button>
+<input type="file" id="fileInput" hidden accept="image/*" onchange="handleFile(this)">
+<textarea id="userInput" rows="1" placeholder="Jo chahe likho..." class="flex-1 bg-transparent outline-none resize-none py-2.5 px-1 text-[15px]"></textarea>
+<button onclick="startVoice()" class="w-9 h-9 rounded-full bg-zinc-800 flex items-center justify-center flex-shrink-0">🎤</button>
+<button onclick="sendMessage()" class="w-9 h-9 rounded-full bg-white text-black flex items-center justify-center font-bold flex-shrink-0">↑</button>
+</div>
+</div>
+
 <script>
-function startMic(){
- const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
- if(!SR){alert('Chrome me kholo');return;}
- let r=new SR(); r.lang='hi-IN'; r.start();
- r.onresult=e=>{document.getElementById('prompt').value=e.results[0][0].transcript;}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open')}
+function newChat(){document.getElementById('chatContainer').innerHTML=`<h1 class=text-2xl font-bold>Kya banana hai?</h1><p class="text-zinc-500 text-sm mt-2 text-center max-w-[280px]">Jo chahe likho - AI wahi banayega.</p>`}
+
+let currentFile=null;
+function handleFile(input){
+let file=input.files[0]; if(!file) return; currentFile=file;
+let prev=document.getElementById('previewArea'); prev.classList.remove('hidden');
+prev.innerHTML=`<div class="bg-zinc-800 px-3 py-1 rounded-full text-xs inline-flex">📎 ${file.name} <span onclick="clearFile()" class="ml-2 cursor-pointer">x</span></div>`;
 }
-function gen(){
- let p=document.getElementById('prompt').value||'Diwali Poster';
- document.getElementById('result').innerHTML=`<p>Ban gaya: ${p}</p><img src="https://dummyimage.com/512x512/101010/00FF88&text=${p.replace(/ /g,'+')}"><br><br><a href="https://dummyimage.com/512x512/101010/00FF88&text=${p.replace(/ /g,'+')}" download><button class="btn-main" style="background:#222;color:white">Download ⬇️</button></a>`;
+function clearFile(){currentFile=null; document.getElementById('previewArea').classList.add('hidden')}
+
+function startVoice(){
+let rec=new (window.SpeechRecognition||window.webkitSpeechRecognition)();
+rec.lang='hi-IN'; rec.start();
+rec.onresult=(e)=>{document.getElementById('userInput').value=e.results[0][0].transcript}
+}
+
+async function sendMessage(){
+let input=document.getElementById('userInput');
+let text=input.value.trim(); if(!text &&!currentFile) return;
+
+let container=document.getElementById('chatContainer');
+if(container.innerHTML.includes('Kya banana hai?')) container.innerHTML='';
+container.classList.remove('justify-center','items-center');
+container.classList.add('space-y-4','items-stretch');
+
+let userDiv=document.createElement('div');
+userDiv.className="self-end bg-[#2f2f2f] px-4 py-2 rounded-2xl max-w-[85%] text-sm";
+userDiv.innerText=text;
+container.appendChild(userDiv);
+input.value=''; clearFile();
+
+let aiDiv=document.createElement('div');
+aiDiv.className="self-start bg-[#1a1a1a] border border-zinc-800 px-4 py-3 rounded-2xl max-w-[90%] text-sm";
+aiDiv.innerHTML="Bana raha hu... ⏳";
+container.appendChild(aiDiv);
+container.scrollTop=container.scrollHeight;
+
+// ALWAYS GENERATE IMAGE FOR ANY PROMPT
+let imgUrl=`https://image.pollinations.ai/prompt/${encodeURIComponent(text)}?width=768&height=768&seed=${Math.floor(Math.random()*10000)}&nologo=true`;
+aiDiv.innerHTML=`Tumne bola: <b>${text}</b><br><br><img src="${imgUrl}" class="rounded-xl mt-2 w-full" onload="this.scrollIntoView()"><br><br><a href="${imgUrl}" download target="_blank" class="bg-white text-black px-4 py-2 rounded-full text-xs font-bold inline-block mt-2">Download Photo</a>`;
+
 }
 </script>
 </body>
