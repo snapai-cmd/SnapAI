@@ -1,133 +1,105 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-<title>GANGSTER CRIME CITY 6.0</title>
+<title>GANGSTER CRIME CITY 7.0</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial Black,Arial}
 body{background:#000;color:#fff;overflow:hidden}
-canvas{width:100vw;height:100vh;display:block}
+canvas{display:block;width:100vw;height:100vh}
 
-/* INTRO ANIMATED */
-#intro{position:fixed;inset:0;background:#000;z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
+/* ===== LOADING ===== */
+#intro{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:#000;overflow:hidden}
 #intro.hide{opacity:0;pointer-events:none;transition:1s}
-#introBg{position:absolute;inset:0;z-index:0}
-#logoWrap{z-index:2;text-align:center;position:relative}
-#logo{font-size:52px;letter-spacing:8px;line-height:.9;animation:logoAnim 2s infinite alternate}
-@keyframes logoAnim{0%{color:#fff;text-shadow:0 0 10px #8b5cf6,0 0 30px #8b5cf6,0 0 60px #8b5cf6;transform:scale(1) rotate(-1deg)}100%{color:#d8b4fe;text-shadow:0 0 20px #fff,0 0 50px #00d4ff,0 0 100px #8b5cf6;transform:scale(1.05) rotate(1deg)}}
-#sub{color:#c4b5fd;font-size:11px;letter-spacing:5px;margin-top:8px;animation:fade 1.5s infinite}
-@keyframes fade{0%,100%{opacity:.6}50%{opacity:1}}
-#bar{width:340px;height:12px;background:rgba(255,255,255,.08);border-radius:20px;margin-top:22px;overflow:hidden;border:1px solid rgba(139,92,246,.4);z-index:2;position:relative}
-#fill{width:0%;height:100%;background:linear-gradient(90deg,#8b5cf6,#00d4ff,#fff,#8b5cf6);background-size:400% 100%;animation:shimmer 1s linear infinite;box-shadow:0 0 20px #8b5cf6}
-@keyframes shimmer{0%{background-position:0%}100%{background-position:400%}}
-#txt{margin-top:12px;font-size:11px;color:#999;letter-spacing:2px;z-index:2}
+#bg{position:absolute;inset:0}
+#center{z-index:2;text-align:center}
+#logo{font-size:56px;line-height:.9;letter-spacing:7px;animation:glow 1.6s infinite alternate}
+@keyframes glow{0%{color:#fff;text-shadow:0 0 15px #8b5cf6,0 0 40px #8b5cf6;transform:scale(1)}100%{color:#e9d5ff;text-shadow:0 0 25px #fff,0 0 70px #00d4ff,0 0 110px #8b5cf6;transform:scale(1.06)}}
+#tag{color:#a78bfa;font-size:11px;letter-spacing:5px;margin-top:6px}
+#bar{width:340px;height:12px;background:rgba(255,255,255,.07);border:1px solid rgba(139,92,246,.4);border-radius:20px;margin:22px auto 0;overflow:hidden}
+#fill{width:0%;height:100%;background:linear-gradient(90deg,#8b5cf6,#00d4ff,#fff,#8b5cf6);background-size:300% 100%;animation:shift 1s linear infinite}
+@keyframes shift{0%{background-position:0%}100%{background-position:300%}}
+#per{margin-top:10px;font-size:11px;color:#888;letter-spacing:2px}
 
-#menu{position:fixed;inset:0;background:radial-gradient(circle at 30% 50%,#1a1033,#000);z-index:150;display:none;flex-direction:column;align-items:center;justify-content:center}
+/* ===== MENU ===== */
+#menu{position:fixed;inset:0;z-index:90;background:radial-gradient(circle at 30% 50%,#1e123f,#000);display:none;align-items:center;justify-content:center;flex-direction:column}
 #menu.show{display:flex}
-.btn{width:300px;padding:14px;margin:8px;background:linear-gradient(90deg,#111,#222);border:2px solid #444;border-radius:14px;color:#fff;font-size:14px;cursor:pointer}
-.btn:hover{border-color:#8b5cf6;background:#8b5cf6;box-shadow:0 0 20px #8b5cf6}
-.btn.main{background:linear-gradient(90deg,#8b5cf6,#00d4ff);border:none;box-shadow:0 0 25px #8b5cf6}
+.btn{width:310px;padding:15px;margin:8px;border-radius:14px;border:none;color:#fff;font-size:14px;cursor:pointer}
+.btn.main{background:linear-gradient(90deg,#8b5cf6,#00d4ff);box-shadow:0 0 30px #8b5cf6}
+.btn.sec{background:#111;border:2px solid #333}
 </style></head><body>
 
-<div id="intro">
-<canvas id="introBg"></canvas>
-<div id="logoWrap">
+<div id="intro"><canvas id="bg"></canvas>
+<div id="center">
 <div id="logo">GANGSTER<br>CRIME CITY</div>
-<div id="sub">VOID RAGE YT PRESENTS</div>
+<div id="tag">VOID RAGE YT PRESENTS</div>
 <div id="bar"><div id="fill"></div></div>
-<div id="txt">LOADING ULTRA WORLD... 0%</div>
-<div style="margin-top:10px;font-size:8px;color:#444;letter-spacing:2px">TAP TO ENABLE SOUND 🔊</div>
+<div id="per">LOADING ULTRA WORLD... 0%</div>
 </div>
 </div>
 
 <div id="menu">
-<div style="font-size:48px;text-align:center;line-height:.9;text-shadow:0 0 30px #8b5cf6">GANGSTER<br>CRIME CITY</div>
-<div style="color:#8b5cf6;font-size:10px;letter-spacing:4px;margin:10px 0 20px">v6.0 • ANIMATED • NO COPYRIGHT</div>
-<button class="btn main" onclick="startGame()">▶ PLAY - ULTRA WORLD</button>
-<button class="btn" onclick="startGame()">🔊 SOUND ON + PLAY</button>
+<div style="font-size:50px;line-height:.9;text-align:center;text-shadow:0 0 30px #8b5cf6">GANGSTER<br>CRIME CITY</div>
+<div style="color:#8b5cf6;letter-spacing:4px;font-size:10px;margin:12px 0 22px">v7.0 • FINAL • NO ROTATE • NO BOAT TEXT</div>
+<button class="btn main" onclick="start()">▶ PLAY ULTRA WORLD</button>
 </div>
 
-<canvas id="c"></canvas>
+<canvas id="game"></canvas>
 
 <script>
-// ===== ANIMATED INTRO BG =====
-const ib=document.getElementById('introBg'),ibx=ib.getContext('2d');
-function ibRs(){ib.width=innerWidth;ib.height=innerHeight} ibRs();
-onresize=()=>{ibRs(); rs();}
-let parts=[]; for(let i=0;i<90;i++)parts.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*3+1,s:Math.random()*1.2+.3,h:260+Math.random()*60});
-function ibLoop(){
-ibx.fillStyle='rgba(0,0,0,0.3)'; ibx.fillRect(0,0,ib.width,ib.height);
-// moving gradient
-let g=ibx.createRadialGradient(ib.width/2,ib.height/2,0,ib.width/2,ib.height/2,ib.width);
-g.addColorStop(0,'rgba(139,92,246,0.15)'); g.addColorStop(0.5,'rgba(0,212,255,0.08)'); g.addColorStop(1,'rgba(0,0,0,0)');
-ibx.fillStyle=g; ibx.fillRect(0,0,ib.width,ib.height);
-parts.forEach(p=>{
-p.y-=p.s; p.x+=Math.sin(Date.now()*0.001+p.x)*0.6;
-if(p.y<0){p.y=ib.height; p.x=Math.random()*ib.width;}
-ibx.shadowColor=`hsl(${p.h},100%,70%)`; ibx.shadowBlur=12;
-ibx.fillStyle=`hsl(${p.h},100%,70%)`;
-ibx.beginPath(); ibx.arc(p.x,p.y,p.r,0,6.28); ibx.fill(); ibx.shadowBlur=0;
-});
-requestAnimationFrame(ibLoop);
-} ibLoop();
+// ===== ANIMATED BG - PARTICLES =====
+const bg=document.getElementById('bg'), bx=bg.getContext('2d');
+function rsz(){bg.width=innerWidth; bg.height=innerHeight} rsz();
+let dots=[]; for(let i=0;i<70;i++) dots.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*2.5+1,s:Math.random()*1+0.4});
+(function anim(){
+bx.fillStyle='rgba(0,0,0,0.25)'; bx.fillRect(0,0,bg.width,bg.height);
+let g=bx.createRadialGradient(bg.width/2,bg.height/2,0,bg.width/2,bg.height/2,bg.width);
+g.addColorStop(0,'rgba(139,92,246,0.18)'); g.addColorStop(1,'rgba(0,0,0,0)'); bx.fillStyle=g; bx.fillRect(0,0,bg.width,bg.height);
+dots.forEach(d=>{d.y-=d.s; if(d.y<0){d.y=bg.height; d.x=Math.random()*bg.width;} bx.fillStyle='#a78bfa'; bx.shadowColor='#8b5cf6'; bx.shadowBlur=10; bx.beginPath(); bx.arc(d.x,d.y,d.r,0,6.28); bx.fill(); bx.shadowBlur=0;});
+requestAnimationFrame(anim);
+})();
 
-// ===== LOADING - NEVER STUCK =====
-const fill=document.getElementById('fill'),txt=document.getElementById('txt'),intro=document.getElementById('intro'),menu=document.getElementById('menu');
-let load=0; let t=setInterval(()=>{
-load+=Math.random()*14+7; if(load>100)load=100;
-fill.style.width=load+'%'; txt.innerText=`LOADING ULTRA WORLD... ${Math.floor(load)}%`;
-if(load>=100){clearInterval(t); setTimeout(()=>{intro.classList.add('hide'); menu.classList.add('show');},700);}
-},120);
-// force show after 4.5 sec even if error
-setTimeout(()=>{intro.classList.add('hide'); menu.classList.add('show');},4500);
+// ===== LOADING - CLEAN, NO BOAT TEXT =====
+const fill=document.getElementById('fill'), per=document.getElementById('per'), intro=document.getElementById('intro'), menu=document.getElementById('menu');
+let p=0; let iv=setInterval(()=>{p+=Math.random()*12+8; if(p>100)p=100; fill.style.width=p+'%'; per.innerText=`LOADING ULTRA WORLD... ${Math.floor(p)}%`; if(p>=100){clearInterval(iv); setTimeout(()=>{intro.classList.add('hide'); menu.classList.add('show');},700);}},130);
+setTimeout(()=>{intro.classList.add('hide'); menu.classList.add('show');},4800);
 
-// ===== NO COPYRIGHT SOUND - SELF GENERATED =====
-let audioCtx;
-function playSound(){
+// ===== NO COPYRIGHT SOUND - SELF MADE =====
+let actx;
+function sound(){
 try{
-if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
-// Bass
-let o=audioCtx.createOscillator(), g=audioCtx.createGain();
-o.type='sawtooth'; o.frequency.value=80;
-g.gain.setValueAtTime(0.15,audioCtx.currentTime);
-g.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+0.6);
-o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+0.6);
-// Beep
-let o2=audioCtx.createOscillator(), g2=audioCtx.createGain();
-o2.frequency.value=880; g2.gain.setValueAtTime(0.12,audioCtx.currentTime);
-g2.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+0.3);
-o2.connect(g2); g2.connect(audioCtx.destination); o2.start(); o2.stop(audioCtx.currentTime+0.3);
+if(!actx) actx=new (window.AudioContext||window.webkitAudioContext)();
+let o=actx.createOscillator(), g=actx.createGain(); o.type='sine';
+o.frequency.setValueAtTime(200,actx.currentTime); o.frequency.linearRampToValueAtTime(800,actx.currentTime+0.4);
+g.gain.setValueAtTime(0.25,actx.currentTime); g.gain.exponentialRampToValueAtTime(0.01,actx.currentTime+0.5);
+o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+0.5);
 }catch(e){}
 }
-// Play on any tap
-document.addEventListener('click',playSound,{once:true});
-document.addEventListener('touchstart',playSound,{once:true});
+document.addEventListener('click',sound,{once:true}); document.addEventListener('touchstart',sound,{once:true});
 
-// ===== GAME START =====
-const c=document.getElementById('c'),ctx=c.getContext('2d'); let W,H;
-function rs(){W=c.width=innerWidth;H=c.height=innerHeight} rs();
-function startGame(){playSound(); intro.classList.add('hide'); menu.classList.add('show'); menu.classList.remove('show'); init();}
+function start(){sound(); intro.classList.add('hide'); menu.classList.remove('show'); initGame();}
 
-let player={x:0,y:0}, cam={x:0,y:0}, boats=[]; let sea={x:-4000,y:0,w:6000,h:8000};
-function init(){
-for(let i=0;i<400;i++)boats.push({x:sea.x+Math.random()*sea.w,y:sea.y+(Math.random()-0.5)*sea.h,a:Math.random()*6.28});
+// ===== MAIN GAME - NO ROTATE SYSTEM =====
+const c=document.getElementById('game'), ctx=c.getContext('2d');
+function rs(){c.width=innerWidth; c.height=innerHeight} rs(); window.onresize=rs;
+let player={x:0,y:0}, boats=[];
+function initGame(){
+rs();
+for(let i=0;i<300;i++) boats.push({x:(Math.random()-0.5)*8000,y:(Math.random()-0.5)*8000,a:Math.random()*6.28});
 loop();
 }
 function loop(){
-let t=Date.now()*0.001;
-// ultra sky
-let sky=ctx.createLinearGradient(0,0,0,H); sky.addColorStop(0,'#020211'); sky.addColorStop(.5,'#1a1033'); sky.addColorStop(.7,'#ff7e5f'); sky.addColorStop(1,'#feb47b');
-ctx.fillStyle=sky; ctx.fillRect(0,0,W,H);
-// sea waves
-for(let l=0;l<3;l++){
-ctx.fillStyle=`rgba(5,${40+l*15},${90+l*18},${0.9-l*0.2})`;
-ctx.beginPath();
-for(let x=sea.x;x<=sea.x+sea.w;x+=30){let y=sea.y-sea.h/2 + Math.sin(x*0.008+t+l)*12 + l*40; let sx=x+W/2-player.x, sy=y+H/2-player.y;
-if(x==sea.x) ctx.moveTo(sx,sy); else ctx.lineTo(sx,sy);}
-ctx.lineTo(sea.x+sea.w+W/2-player.x, sea.y+sea.h/2+H/2-player.y); ctx.lineTo(sea.x+W/2-player.x, sea.y+sea.h/2+H/2-player.y); ctx.closePath(); ctx.fill();
-}
+// sky
+let sky=ctx.createLinearGradient(0,0,0,c.height); sky.addColorStop(0,'#07051a'); sky.addColorStop(0.6,'#1a1033'); sky.addColorStop(1,'#ff9a6b');
+ctx.fillStyle=sky; ctx.fillRect(0,0,c.width,c.height);
+// sea
+ctx.fillStyle='#0a3a5a'; ctx.fillRect(c.width/2-4000-player.x,c.height/2-3000-player.y,8000,6000);
+// boats
 boats.forEach(b=>{
-let sx=b.x+W/2-player.x, sy=b.y+H/2-player.y;
-ctx.save(); ctx.translate(sx,sy); ctx.rotate(b.a); ctx.fillStyle='#5af'; ctx.fillRect(-22,-9,44,18); ctx.restore();
+let sx=b.x+c.width/2-player.x, sy=b.y+c.height/2-player.y;
+if(sx>-50&&sx<c.width+50&&sy>-50&&sy<c.height+50){
+ctx.save(); ctx.translate(sx,sy); ctx.rotate(b.a); ctx.fillStyle='#5de2ff'; ctx.fillRect(-18,-7,36,14); ctx.restore();
+}
 });
-ctx.save(); ctx.translate(W/2,H/2); ctx.fillStyle='#8b5cf6'; ctx.shadowColor='#8b5cf6'; ctx.shadowBlur=20; ctx.beginPath(); ctx.arc(0,0,12,0,6.28); ctx.fill(); ctx.shadowBlur=0; ctx.restore();
+// player
+ctx.fillStyle='#8b5cf6'; ctx.shadowColor='#8b5cf6'; ctx.shadowBlur=18; ctx.beginPath(); ctx.arc(c.width/2,c.height/2,13,0,6.28); ctx.fill(); ctx.shadowBlur=0;
 requestAnimationFrame(loop);
 }
 </script></body></html>
