@@ -1,0 +1,156 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+<title>GANGSTER CRIME CITY 5.2 - ULTRA</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial Black,Arial}body{background:#000;color:#fff;overflow:hidden}
+canvas{width:100vw;height:100vh;display:block}
+#intro{position:fixed;inset:0;background:#000;z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 1s}
+#intro.hide{opacity:0;pointer-events:none}
+#logo{font-size:48px;letter-spacing:8px;animation:glow 2s infinite;text-align:center;line-height:1}
+@keyframes glow{0%,100%{color:#fff;text-shadow:0 0 20px #8b5cf6}50%{color:#8b5cf6;text-shadow:0 0 50px #fff,0 0 80px #8b5cf6}}
+#loadBar{width:300px;height:7px;background:#222;border-radius:10px;margin-top:20px;overflow:hidden}
+#loadFill{width:0%;height:100%;background:linear-gradient(90deg,#8b5cf6,#00d4ff,#fff);transition:width 0.15s}
+#menu{position:fixed;inset:0;background:radial-gradient(circle at 20% 50%,#1a1033,#000);z-index:150;display:none;flex-direction:column;align-items:center;justify-content:center}
+#menu.show{display:flex}
+.btn{width:300px;padding:14px;margin:8px;background:linear-gradient(90deg,#111,#222);border:2px solid #444;border-radius:12px;color:#fff;font-size:14px;cursor:pointer;letter-spacing:1px}.btn:hover{border-color:#8b5cf6;background:#8b5cf6}
+.btn.resume{background:linear-gradient(90deg,#8b5cf6,#6d28d9);border-color:#8b5cf6;box-shadow:0 0 20px #8b5cf6}
+#charSel{position:fixed;inset:0;background:#000;z-index:140;display:none;flex-direction:column;align-items:center;justify-content:center;overflow-y:auto;padding:20px}
+#charSel.show{display:flex}
+.card{width:340px;background:linear-gradient(180deg,#1a1a1a,#111);border:2px solid #333;border-radius:16px;padding:12px;margin:8px;display:flex;gap:12px;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,0.5)}.card:hover{border-color:#8b5cf6;transform:scale(1.03);box-shadow:0 0 30px rgba(139,92,246,0.4)}
+.hud{position:absolute;top:0;left:0;right:0;padding:8px;display:flex;justify-content:space-between;z-index:5;pointer-events:none;font-size:11px}
+.h{background:rgba(0,0,0,0.8);padding:6px 12px;border-radius:10px;border:1px solid rgba(139,92,246,0.3);backdrop-filter:blur(4px);box-shadow:0 2px 10px rgba(0,0,0,0.5)}
+#controls{position:absolute;bottom:10px;left:10px;right:10px;display:flex;justify-content:space-between;align-items:end;z-index:5}
+.joy{width:88px;height:88px;background:rgba(255,255,255,0.05);border-radius:50%;border:1px solid #333;position:relative;backdrop-filter:blur(3px)}.knob{width:36px;height:36px;background:radial-gradient(circle,#a78bfa,#8b5cf6);border-radius:50%;position:absolute;left:26px;top:26px;box-shadow:0 0 15px #8b5cf6}
+.btns{display:flex;gap:5px;flex-wrap:wrap;max-width:360px;justify-content:end}
+.b{width:52px;height:52px;background:rgba(0,0,0,0.7);border:1px solid #444;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:6.5px;cursor:pointer;backdrop-filter:blur(2px)}.b:active{background:#8b5cf6;transform:scale(0.95)}
+.b.pov{background:linear-gradient(135deg,#8b5cf6,#00d4ff);border-color:#8b5cf6;box-shadow:0 0 15px rgba(139,92,246,0.6)}
+#phone{position:fixed;right:-300px;top:0;width:285px;height:100%;background:linear-gradient(180deg,#0f0f0f,#050505);border-left:2px solid #8b5cf6;z-index:60;transition:0.35s;padding:14px;overflow-y:auto;box-shadow:-10px 0 30px rgba(0,0,0,0.8)}
+#phone.open{right:0}.contact{padding:10px;background:#1e1e1e;margin:6px 0;border-radius:10px;cursor:pointer;font-size:12px;border:1px solid #2a2a2a}.contact:hover{background:#8b5cf6;border-color:#8b5cf6}
+#rotate{position:fixed;inset:0;background:#000;z-index:300;display:none;flex-direction:column;align-items:center;justify-content:center}
+@media(orientation:portrait){#rotate{display:flex}}
+#storyBox{position:fixed;bottom:85px;left:50%;transform:translateX(-50%);width:92%;max-width:680px;background:rgba(0,0,0,0.92);border:1px solid #8b5cf6;border-radius:14px;padding:16px;z-index:55;display:none;font-size:12px;line-height:1.6;box-shadow:0 0 30px rgba(139,92,246,0.4)}
+#povLabel{position:absolute;top:42px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,#8b5cf6,#00d4ff);padding:5px 16px;border-radius:20px;font-size:10px;z-index:6;display:none;box-shadow:0 0 15px #8b5cf6}
+</style></head><body>
+<div id="rotate"><div style="font-size:48px">📱➡️🖥️</div><h2>PLEASE ROTATE TO LANDSCAPE</h2><p style="font-size:12px;color:#888;margin-top:6px">Landscape Only - Like GTA 5</p></div>
+<div id="intro"><div id="logo">GANGSTER<br>CRIME CITY</div><div style="margin-top:10px;color:#aaa;font-size:11px;letter-spacing:3px">VOID RAGE YT PRESENTS</div><div id="loadBar"><div id="loadFill"></div></div><div id="loadTxt" style="margin-top:10px;font-size:10px;color:#666;letter-spacing:2px">LOADING ULTRA WORLD... 0%</div></div>
+<div id="menu"><div style="font-size:46px;margin-bottom:10px;letter-spacing:7px;text-align:center;line-height:0.9;text-shadow:0 0 20px #8b5cf6">GANGSTER<br>CRIME CITY</div><div style="font-size:10px;color:#8b5cf6;letter-spacing:4px;margin-bottom:18px">ULTRA GRAPHICS • 5.2 FINAL</div>
+<button class="btn resume" id="resumeBtn" style="display:none" onclick="resumeGame()">▶ RESUME - Continue Where You Left</button>
+<button class="btn" onclick="showChars()">▶ PLAY - New Story</button>
+<button class="btn" id="restartBtn" style="display:none" onclick="restartGame()">🔄 RESTART - From Beginning</button>
+<div style="margin-top:14px;font-size:9px;color:#555;text-align:center">1000 Boats @130km/h • 3 POV Modes (V Key) • 12 GTA5 Missions<br>Phone System • Parachute • Ultra Graphics</div></div>
+<div id="charSel"><h2 style="margin-bottom:10px;text-shadow:0 0 10px #8b5cf6">CHOOSE YOUR GANGSTER</h2><div id="charList"></div><button class="btn" onclick="document.getElementById('charSel').classList.remove('show');document.getElementById('menu').classList.add('show')">⬅ BACK TO MENU</button></div>
+<canvas id="c"></canvas>
+<div class="hud"><div class="h">💰$<span id="money">5000</span> | 🚤<span id="bspeed">0</span> km/h | <span id="veh">ON FOOT</span></div><div class="h">📍<span id="loc">GURUGRAM</span> | ⛽<span id="fuel">100%</span> | <span id="povHud">3RD</span></div></div>
+<div id="povLabel">THIRD PERSON</div>
+<div id="controls"><div class="joy" id="joy"><div class="knob" id="knob"></div></div><div class="btns">
+<div class="b" id="enter">🚪<br>ENTER</div><div class="b" id="boost">💨<br>BOOST<br>180</div><div class="b pov" id="povBtn">📷<br>POV<br><span id="povTxt">3RD</span></div><div class="b" id="phoneBtn">📱<br>PHONE</div><div class="b" id="paraBtn">🪂<br>PARA</div><div class="b" id="fire">🔫<br>FIRE</div></div></div>
+<div id="phone"><h3>📱 iPhone - Gangster OS</h3><button onclick="document.getElementById('phone').classList.remove('open')" style="background:#222;color:#fff;padding:5px 10px;border-radius:8px;border:1px solid #444;margin:8px 0">✕ Close</button>
+<div style="padding:10px;background:linear-gradient(180deg,#111,#0a0a0a);border-radius:10px;font-size:11px;margin:8px 0;border:1px solid #222"><b>STATS (Time HUD Only Here)</b><br>Time: <span id="ptime"></span><br>Day: <span id="pday"></span> | Wanted: <span id="pwanted"></span> ⭐<br>Location: <span id="ploc"></span><br>Mission: <span id="pmis">1/12</span> | POV: <span id="ppov">THIRD</span><br><small style="color:#8b5cf6">Press V to switch POV</small></div>
+<div id="contacts"></div><div style="margin-top:10px"><h4 style="font-size:11px">📞 Recent Calls</h4><div id="calls" style="font-size:10px;color:#777"></div></div></div>
+<div id="storyBox"></div>
+<script>
+const c=document.getElementById('c'),ctx=c.getContext('2d');let W,H,DPR;function rs(){DPR=window.devicePixelRatio||1;W=innerWidth;H=innerHeight;c.width=W*DPR;c.height=H*DPR;c.style.width=W+'px';c.style.height=H+'px';ctx.setTransform(DPR,0,0,DPR,0,0);}rs();onresize=rs;
+let keys={},player={x:0,y:0,a:0,s:0,z:0,inBoat:false,boat:null,para:false},cam={x:0,y:0},money=5000,fuel=100,wanted=0,timeMin=720,day=1,curMission=0,curPOV=0;
+let allBoats=[],houses=[],selectedChar=null;let povModes=['THIRD','FIRST','TOP-DOWN'];let povShort=['3RD','1ST','TOP'];
+let chars=[{id:0,name:'JAXON COLE',role:'Ex-Army - Tank Expert',emoji:'🪖',home:{x:2000,y:-2000},color:'#4a7c59'},{id:1,name:'TYLER REED',role:'Street Racer - 130km/h Boats',emoji:'🏍️',home:{x:-2000,y:0},color:'#a855f7'},{id:2,name:'MARCUS KANE',role:'Mafia Boss - Controls City',emoji:'🤵',home:{x:2000,y:2000},color:'#f59e0b'}];
+let mafias=[{name:'Viktor - Guns Dealer'},{name:'Rahul Bhai - Cars'},{name:'Dubai Sheikh - 1000 Boats'},{name:'Japan Yakuza - Missions'}];
+let sea={x:-4000,y:0,w:6000,h:8000};
+let missions=[{title:'PROLOGUE: The Return',desc:'You returned to Gurugram after 5 years. Mafia took your house. Go to your HOME marker on map.'},{title:'MISSION 1: Boat Theft (Franklin & Lamar)',desc:'Go to Arabian Sea and steal a 130km/h Speedboat. Press ENTER near boat. Boost to 180km/h with BOOST button.'},{title:'MISSION 2: Repossession',desc:'Steal a Supra from Car Showroom at Cyber City. Use your boat to reach highway NH48.'},{title:'MISSION 3: The Jewel Store Job',desc:'Rob DLF Mall with Marcus. Call Marcus from Phone for backup.'},{title:'MISSION 4: Mr. Philips',desc:'Kill Viktor - Gun Shop Mafia near beach. Use FIRE button. Wanted +1.'},{title:'MISSION 5: Blitz Play',desc:'Use Tank on beach to loot Army Truck. Drive Tank with BOOST for 180km/h.'},{title:'MISSION 6: I Fought The Law',desc:'You have 3 Stars Wanted! Escape police by hiding in deep sea for 30 seconds.'},{title:'MISSION 7: Merryweather Heist',desc:'Loot GOLD Cargo Ship among 1000 ships in deep sea. Find the glowing ship.'},{title:'MISSION 8: The Paleto Score',desc:'Bank Robbery at Gurugram Cyber City Bank. Get $10000. Use First Person POV (V key).'},{title:'MISSION 9: The Bureau Raid',desc:'Hack Police HQ using Phone. Call Japan Yakuza from contacts for codes.'},{title:'MISSION 10: Rampage',desc:'Kill 5 Mafia in 60 seconds near Dubai Highway. Use Top-Down POV to see all.'},{title:'MISSION 11: Stunt Jump',desc:'Parachute from helicopter and land directly on a moving boat at 130km/h. Press PARA.'},{title:'FINAL: The Big Score',desc:'All 3 gangsters escape to Dubai at 180km/h with BOOST + Final Parachute jump!'}];
+let load=0;let introInt=setInterval(()=>{load+=Math.random()*11;if(load>=100){load=100;clearInterval(introInt);document.getElementById('intro').classList.add('hide');document.getElementById('menu').classList.add('show');checkSave();}document.getElementById('loadFill').style.width=load+'%';document.getElementById('loadTxt').innerText=`LOADING ULTRA WORLD... ${Math.floor(load)}%`;},110);
+function checkSave(){let sv=localStorage.getItem('gcc_save');if(sv){document.getElementById('resumeBtn').style.display='block';document.getElementById('restartBtn').style.display='block';}}
+function showChars(){let list=document.getElementById('charList');list.innerHTML='';chars.forEach(ch=>{let d=document.createElement('div');d.className='card';d.innerHTML=`<div style="width:54px;height:54px;border-radius:50%;background:${ch.color};display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 0 20px ${ch.color}">${ch.emoji}</div><div><b style="letter-spacing:1px">${ch.name}</b><br><small style="color:#aaa">${ch.role}</small><br><small style="color:#666">Home: ${ch.home.x},${ch.home.y}</small></div>`;d.onclick=()=>selectChar(ch);list.appendChild(d);});document.getElementById('menu').classList.remove('show');document.getElementById('charSel').classList.add('show');}
+function selectChar(ch){selectedChar=ch;document.getElementById('charSel').classList.remove('show');initWorld();buildPhone();showMission();loop();save();}
+function initWorld(){allBoats=[];for(let i=0;i<700;i++)allBoats.push({x:sea.x+Math.random()*sea.w,y:sea.y+(Math.random()-0.5)*sea.h,a:Math.random()*6.28,type:'BOAT',col:`hsl(${185+Math.random()*45},95%,${60+Math.random()*15}%)`,boostActive:false});for(let i=0;i<300;i++)allBoats.push({x:sea.x+Math.random()*sea.w,y:sea.y+(Math.random()-0.5)*sea.h,a:Math.random()*6.28,type:'SHIP',col:'#5a5a5a'});houses=[];for(let i=0;i<28;i++)houses.push({x:(Math.random()-0.5)*3800,y:(Math.random()-0.5)*3800});player.x=selectedChar.home.x;player.y=selectedChar.home.y;curMission=0;}
+function buildPhone(){let cDiv=document.getElementById('contacts');cDiv.innerHTML='';chars.forEach(o=>{if(o.id!=selectedChar.id){let el=document.createElement('div');el.className='contact';el.innerText=`${o.emoji} ${o.name} - Backup`;el.onclick=()=>addCall(`Called ${o.name} - Backup on the way! +$200`);cDiv.appendChild(el)}});mafias.forEach(m=>{let el=document.createElement('div');el.className='contact';el.innerText=`💀 ${m.name}`;el.onclick=()=>{addCall(`${m.name}: Order delivered! +$300`);money+=300;};cDiv.appendChild(el);});}
+function addCall(t){document.getElementById('calls').innerHTML+=`<div style="padding:3px 0;border-bottom:1px solid #222">${new Date().toLocaleTimeString()} - ${t}</div>`;}
+function showMission(){let box=document.getElementById('storyBox');box.style.display='block';let m=missions[curMission];box.innerHTML=`<b style="color:#8b5cf6;font-size:13px">${m.title}</b><br><span style="color:#ddd">${m.desc}</span><br><br><button onclick="completeMission()" style="background:linear-gradient(90deg,#8b5cf6,#6d28d9);color:#fff;border:none;padding:10px 18px;border-radius:10px;font-weight:bold;cursor:pointer;box-shadow:0 0 15px #8b5cf6">START MISSION ▶</button> <button onclick="document.getElementById('storyBox').style.display='none'" style="background:#222;color:#fff;border:1px solid #444;padding:10px 14px;border-radius:10px;cursor:pointer">SKIP</button>`;document.getElementById('pmis').innerText=`${curMission+1}/${missions.length}`;}
+window.completeMission=()=>{curMission++;if(curMission>=missions.length){document.getElementById('storyBox').innerHTML=`<b style="color:#22c55e;font-size:14px">🏆 ALL 12 MISSIONS COMPLETE!</b><br><span style="color:#fff">You are KING of Gangster Crime City! Free Roam Unlocked. Try all 3 POVs with V key!</span>`;money+=10000;setTimeout(()=>document.getElementById('storyBox').style.display='none',5000);return;}money+=800;wanted=Math.max(0,wanted-1);showMission();save();};
+function save(){localStorage.setItem('gcc_save',JSON.stringify({char:selectedChar,money,fuel,player,day,timeMin,mission:curMission,pov:curPOV}));}
+function resumeGame(){let sv=JSON.parse(localStorage.getItem('gcc_save'));if(!sv)return;selectedChar=sv.char;player=sv.player;money=sv.money;fuel=sv.fuel;curMission=sv.mission||0;curPOV=sv.pov||0;document.getElementById('menu').classList.remove('show');document.getElementById('intro').classList.add('hide');initWorld();player.x=sv.player.x;player.y=sv.player.y;buildPhone();showMission();updatePOVLabel();loop();}
+function restartGame(){localStorage.removeItem('gcc_save');location.reload();}
+function switchPOV(){curPOV=(curPOV+1)%3;updatePOVLabel();save();}
+function updatePOVLabel(){let l=document.getElementById('povLabel');l.innerText=`${povModes[curPOV]} PERSON - ${curPOV==0?'GTA 5 Style':curPOV==1?'Real Eye View':'See 1000 Boats'}`;l.style.display='block';document.getElementById('povTxt').innerText=povShort[curPOV];document.getElementById('povHud').innerText=povShort[curPOV];document.getElementById('ppov').innerText=povModes[curPOV];setTimeout(()=>l.style.display='none',2200);}
+
+function draw(){
+ let zoom=1;if(curPOV==2)zoom=0.42;if(curPOV==1)zoom=1.9;
+ ctx.save();
+ if(curPOV==2||curPOV==1){ctx.translate(W/2,H/2);ctx.scale(zoom,zoom);ctx.translate(-W/2+cam.x,-H/2+cam.y);ctx.translate(-cam.x,-cam.y);}
+
+ // HIGH GRAPHICS SKY
+ let sky=ctx.createLinearGradient(0,-5000+cam.y,0,3000+cam.y);
+ sky.addColorStop(0,'#020211');sky.addColorStop(0.25,'#1a1033');sky.addColorStop(0.5,'#4a2c6b');sky.addColorStop(0.7,'#ff7e5f');sky.addColorStop(1,'#feb47b');
+ ctx.fillStyle=sky;ctx.fillRect(-6000+cam.x,-6000+cam.y,16000,11000);
+ // Sun glow
+ ctx.fillStyle='rgba(255,120,80,0.15)';ctx.beginPath();ctx.arc(2500+cam.x,-1500+cam.y,600,0,6.28);ctx.fill();
+
+ // SEA WITH ANIMATED WAVES
+ let t=Date.now()*0.001;
+ for(let layer=0;layer<4;layer++){
+   ctx.fillStyle=`rgba(5,${40+layer*15},${90+layer*18},${0.9-layer*0.18})`;
+   ctx.beginPath();
+   for(let x=sea.x;x<=sea.x+sea.w;x+=30){
+     let y=sea.y-sea.h/2 + Math.sin(x*0.008+t+layer)*12 + Math.cos(x*0.015-t*0.7)*6*layer + layer*40;
+     if(x==sea.x)ctx.moveTo(x+cam.x,y+cam.y);else ctx.lineTo(x+cam.x,y+cam.y);
+   }
+   ctx.lineTo(sea.x+sea.w+cam.x,sea.y+sea.h/2+cam.y);ctx.lineTo(sea.x+cam.x,sea.y+sea.h/2+cam.y);ctx.closePath();ctx.fill();
+ }
+ // Sea highlight
+ ctx.fillStyle='rgba(255,255,255,0.07)';ctx.fillRect(sea.x+cam.x,sea.y-sea.h/2+cam.y,sea.w,60);
+
+ // SAND + ROAD
+ ctx.fillStyle='#c2b280';ctx.fillRect(sea.x+sea.w+cam.x,-4000+cam.y,4000,8000);
+ ctx.shadowColor='rgba(0,0,0,0.6)';ctx.shadowBlur=25;ctx.fillStyle='#1e1e1e';ctx.fillRect(sea.x+sea.w+cam.x,-36+cam.y,4000,72);ctx.shadowBlur=0;
+ ctx.fillStyle='#fff';for(let i=0;i<120;i++){ctx.fillRect(sea.x+sea.w+(i*70)%4000+cam.x,-2+cam.y,28,4);}
+
+ // HOUSES - ULTRA
+ houses.forEach(h=>{
+   let sx=h.x+cam.x,sy=h.y+cam.y;if(sx>-180&&sx<W+180&&sy>-180&&sy<H+180){
+     ctx.shadowColor='rgba(0,0,0,0.7)';ctx.shadowBlur=20;ctx.shadowOffsetY=12;
+     ctx.fillStyle='#3a3a3a';ctx.fillRect(sx-24,sy-24,48,48);
+     ctx.shadowBlur=0;ctx.shadowOffsetY=0;
+     // Windows light at night
+     let isNight=timeMin>1080||timeMin<360;
+     ctx.fillStyle=isNight?'#ffeb3b':'#1a1a1a';ctx.fillRect(sx-10,sy-10,9,9);ctx.fillRect(sx+2,sy-10,9,9);
+     ctx.fillStyle='#ff0';ctx.fillRect(sx-6,sy+14,12,9);
+     ctx.fillStyle='#fff';ctx.font='bold 6px Arial';ctx.fillText('DLF',sx-8,sy+2);
+     if(isNight){ctx.fillStyle='rgba(255,235,59,0.25)';ctx.beginPath();ctx.arc(sx,sy,30,0,6.28);ctx.fill();}
+   }
+ });
+
+ // BOATS - ULTRA WITH REFLECTION
+ allBoats.forEach(b=>{
+   let sx=b.x+cam.x,sy=b.y+cam.y;if(sx>-140&&sx<W+140&&sy>-140&&sy<H+140){
+     ctx.save();ctx.translate(sx,sy);ctx.rotate(b.a);
+     // Water shadow/reflection
+     ctx.fillStyle='rgba(0,0,0,0.35)';ctx.fillRect(-26,-8,52,26);
+     if(b.type=='SHIP'){
+       ctx.fillStyle=b.col;ctx.fillRect(-40,-18,80,36);ctx.fillStyle='#222';ctx.fillRect(-12,-24,24,10);ctx.fillStyle='#ff3b3b';ctx.fillRect(30,-4,6,8);
+     }else{
+       let grad=ctx.createLinearGradient(-24,0,24,0);grad.addColorStop(0,b.col);grad.addColorStop(1,'#ffffff');
+       ctx.fillStyle=grad;ctx.fillRect(-26,-11,52,22);ctx.fillStyle='#0a0a0a';ctx.fillRect(-26,-11,52,4);
+       ctx.fillStyle='#fff';ctx.fillRect(20,-4,9,8);
+       // Headlight beam at night
+       if(timeMin>1080||timeMin<360){ctx.fillStyle='rgba(255,245,200,0.7)';ctx.beginPath();ctx.moveTo(28,0);ctx.lineTo(75,-10);ctx.lineTo(75,10);ctx.closePath();ctx.fill();}
+       // Boost trail neon
+       if(b.boostActive){ctx.shadowColor='#00e5ff';ctx.shadowBlur=22;ctx.fillStyle='rgba(0,229,255,0.95)';ctx.fillRect(-36,-9,16,18);ctx.shadowBlur=0;}
+     }
+     ctx.restore();
+   }
+ });
+
+ // PLAYER
+ if(curPOV==1){
+   ctx.save();ctx.translate(W/2,H/2);
+   if(player.inBoat){
+     ctx.fillStyle='#0a0a0a';ctx.fillRect(-W,-90,W*2,90);
+     ctx.fillStyle='rgba(0,229,255,0.9)';ctx.shadowColor='#00e5ff';ctx.shadowBlur=18;ctx.fillRect(-260,-22,520,16);ctx.shadowBlur=0;
+     ctx.fillStyle='#fff';ctx.font='bold 13px Arial';ctx.fillText(`FIRST PERSON • ${Math.floor(Math.abs(player.s)*10)} KM/H • BOOST ${player.boat?.boostActive?'ON 180':'OFF 130'}`,-140,2);
+   }else if(player.para){
+     ctx.fillStyle='rgba(255,255,255,0.92)';ctx.beginPath();ctx.arc(0,-100,75,0,Math.PI,true);ctx.fill();ctx.strokeStyle='#8b5cf6';ctx.lineWidth=2;ctx.stroke();
+     ctx.fillStyle='#000';ctx.font='11px Arial';ctx.fillText('PARACHUTE - FIRST PERSON',-70,-55);
+   }else{
+     ctx.fillStyle='rgba(0,0,0,0.15)';ctx.fillRect(-120,70,240,160);
+   }
+   ctx.restore();
+ }else{
+   ctx.save();ctx.translate(W/2,H/2);ctx.rotate(player.a);
+   ctx.shado
